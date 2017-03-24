@@ -75,7 +75,7 @@ shinyServer(function(input, output,session) {
     })
     
     # choose the way the date will be displayed
-    if(values$Ntyp<3) output_choice<-1 else output_choice<-sample.int(3, size=1)
+    output_choice<-sample.int(4, size=1)
     
     if(output_choice==1) # handwritten date
     {
@@ -88,10 +88,15 @@ shinyServer(function(input, output,session) {
         plot_calendar_page(values$dateToType)
       }, width=500, height = 400 ) 
     }
-    else # text date
+    else if(output_choice==3) # text date in day month year format
     {
       output$imageDate <- renderPlot({
-        full_text_date(values$dateToType)
+        full_text_date(values$dateToType, format="dmy")
+      }, width=500, height = 200 ) 
+    }else # text date in month day year format
+    {
+      output$imageDate <- renderPlot({
+        full_text_date(values$dateToType, format="mdy")
       }, width=500, height = 200 ) 
     }
     
@@ -261,8 +266,10 @@ plot_calendar_page <- function(date=as.Date("01/01/2017", format="%d/%m/%Y"), wi
 #' @export
 #' @examples
 #' plot_calendar_page(Sys.Date()) # show a page with today's date circled in red
-full_text_date<-function(date=as.Date("01/01/2017", format="%d/%m/%Y"))
+full_text_date<-function(date=as.Date("01/01/2017", format="%d/%m/%Y"), format=c("dmy","mdy"))
 {
+  format <- match.arg(format)
+  
   #Names of the calendar months
   month.names <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
   
@@ -270,15 +277,21 @@ full_text_date<-function(date=as.Date("01/01/2017", format="%d/%m/%Y"))
   day.names <- paste0(c("Sun","Mon","Tues","Wednes","Thurs","Fri","Satur"),"day")
   
   #convert the date in the POSIXlt classes
-  date_lt<-as.POSIXlt(date)
+  date_lt <- as.POSIXlt(date)
   
   #derive the suffixe the numeral
-  if(date_lt$mday %in% c(1,21,31)) suf="st" else
-    if(date_lt$mday %in% c(2,22)) suf="nd" else
-      if(date_lt$mday %in% c(3,23)) suf="rd" else
-        suf="th"
+  if(date_lt$mday %in% c(1,21,31)) suf <- "st" else
+    if(date_lt$mday %in% c(2,22)) suf <- "nd" else
+      if(date_lt$mday %in% c(3,23)) suf <- "rd" else
+        suf <- "th"
   
-  written_date <- paste0(day.names[date_lt$wday+1]," ",date_lt$mday,suf," ",month.names[date_lt$mon + 1]," ",date_lt$year+1900)
+  if(format=="dmy")
+  {
+    written_date <- paste0(day.names[date_lt$wday+1]," ",date_lt$mday,suf," ",month.names[date_lt$mon + 1]," ",date_lt$year+1900)
+  }else if(format=="mdy")
+  {
+    written_date <- paste0(day.names[date_lt$wday+1]," ",month.names[date_lt$mon + 1]," ",date_lt$mday,suf," ",date_lt$year+1900)
+  }
   
   plot(NULL,xlim=c(0,300),ylim=c(0,50), axes = F, xlab="",ylab="", main="")
   rect(xleft = 0, xright = 300, ybottom = 0, ytop = 50)
