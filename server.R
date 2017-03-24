@@ -98,10 +98,22 @@ shinyServer(function(input, output,session) {
     }
     
     # display as new output text the number of dates typed in until now
-    txt2 <- paste("You have entered a total of",values$Ntyp,"dates")
+    txt2 <- paste0(make_title("YOUR STATS"),
+                      "You have entered a total of",values$Ntyp,"dates")
     # and if an error was made, display it
-    if(!values$error) txt1 <- "" else txt1 <- paste0("!!!!!!!!!!!!!!!!!!!!!\n       TYPO!       \n!!!!!!!!!!!!!!!!!!!!!\nThe date was '",values$tabEntries[nr,2],"' and you typed in '",values$tabEntries[nr,1],"'.\n\n\n")
-    output$text <- renderText(paste0(txt1, txt2))
+    if(!values$error) 
+    {
+      txt1 <- "" 
+    } else 
+    {
+      txt1 <- paste0(make_title("TYPO!"),
+                      "The date was '",
+                      values$tabEntries[nr,2],
+                      "' and you typed in '",
+                      values$tabEntries[nr,1],"'.\n\n\n")
+      
+      output$text <- renderText(paste0(txt1, txt2))
+    }
   })
   
   ########################################
@@ -130,6 +142,16 @@ shinyServer(function(input, output,session) {
   ### if people type in a large number of dates and server crashes or they loose connection 
   
 })
+
+
+########################################
+# function to make a title look nice in the output #
+########################################
+make_title <- function(txt)
+{
+  return(paste0("------------------------------------\n               ",txt,"               \n------------------------------------\n"))
+}
+
 
 ########################################
 # saving entries #
