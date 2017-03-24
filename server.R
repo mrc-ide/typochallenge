@@ -108,7 +108,7 @@ shinyServer(function(input, output,session) {
     
     # display as new output text the number of dates typed in until now
     txt2 <- paste0(make_title("YOUR STATS"),
-                      "You have entered a total of ",values$Ntyp," dates")
+                   "You have entered a total of ",values$Ntyp," dates")
     # and if an error was made, display it
     if((values$tabEntries[nrow(values$tabEntries),1] == values$tabEntries[nrow(values$tabEntries),2])) 
     {
@@ -116,10 +116,10 @@ shinyServer(function(input, output,session) {
     } else 
     {
       txt1 <- paste0(make_title("TYPO AT LAST ENTRY!"),
-                      "The date was '",
-                      values$tabEntries[nrow(values$tabEntries),2],
-                      "' and you typed in '",
-                      values$tabEntries[nrow(values$tabEntries),1],"'.\n\n\n")
+                     "The date was '",
+                     values$tabEntries[nrow(values$tabEntries),2],
+                     "' and you typed in '",
+                     values$tabEntries[nrow(values$tabEntries),1],"'.\n\n\n")
     }
     output$text <- renderText(paste0(txt1, txt2))
   })
@@ -129,17 +129,26 @@ shinyServer(function(input, output,session) {
   ########################################
   
   # when user presses end of challenge button, save the dates entered up to now in file
-  observeEvent(input$end, isolate({
-    if(!values$final_data_saved) saveData(values$tabEntries) # save data unless already done
-    values$final_data_saved <- TRUE # record the fact that we have already saved the data
+  observeEvent(input$end, isolate({ # save data unless already done
+    if(!values$final_data_saved) 
+    {
+      saveData(values$tabEntries) # save data 
+      values$tabEntries <- NULL # reset entries to nothing, so that if a second set of data is entered it is recorded without the first set which has just been recorded
+      values$final_data_saved <- TRUE # record the fact that we have already saved the data
+    }
   }))
-
+  
   ########################################
   # what happends if browser is closed #
   ########################################
   session$onSessionEnded(function() {
     isolate({
-      if(!values$final_data_saved) saveData(values$tabEntries) # save data unless already done
+      if(!values$final_data_saved) 
+      {
+        saveData(values$tabEntries) # save data 
+        values$tabEntries <- NULL # reset entries to nothing, so that if a second set of data is entered it is recorded without the first set which has just been recorded
+        values$final_data_saved <- TRUE # record the fact that we have already saved the data
+      }
       stopApp}) # make sure app is stopped
   })
   
@@ -161,10 +170,10 @@ make_title <- function(txt)
   ntot <- 36
   nspaces <- (ntot - nchar(txt))/2
   return(paste0( makeNstr("-",ntot),"\n",
-                  makeNstr(" ", nspaces),
-                  txt,
-                  makeNstr(" ", nspaces),"\n",
-                  makeNstr("-",ntot),"\n"))
+                 makeNstr(" ", nspaces),
+                 txt,
+                 makeNstr(" ", nspaces),"\n",
+                 makeNstr("-",ntot),"\n"))
 }
 
 ########################################
