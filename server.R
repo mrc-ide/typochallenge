@@ -67,7 +67,12 @@ shinyServer(function(input, output,session) {
   observeEvent(input$submit, {
     #saveData(formData())
     isolate({
-      values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(values$dateToType)))
+      values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y"))))
+      nr <- nrow(values$tabEntries)                                                     
+      values$error <- (values$tabEntries[nr,1] != values$tabEntries[nr,2])
+      print(values$error)
+      print(values$tabEntries[nr,])
+      
       values$dateToType <- as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
       output$table <- renderTable(values$tabEntries)
       # resetting the entry to be blank after the user clicks the submit button
@@ -75,30 +80,31 @@ shinyServer(function(input, output,session) {
     })
     
     # choose the way the date will be displayed
-    if(values$Ntyp<3)
-      output_choice<-1 else
-        output_choice<-sample.int(3, size=1)
-      
-      if(output_choice==1) # handwritten date
-      {
-        output$imageDate <- renderPlot({
-          plot_handwritten_date(values$dateToType)
-        }, width=200, height = 40 )
-      } else if(output_choice==2) # calendar date
-      {
-        output$imageDate <- renderPlot({
-          plot_calendar_page(values$dateToType)
-        }, width=500, height = 400 ) 
-      }
-      else # text date
-      {
-        output$imageDate <- renderPlot({
-          full_text_date(values$dateToType)
-        }, width=500, height = 200 ) 
-      }
-      
-      # display as new output text the number of dates typed in until now
-      output$text <- renderText(paste("You have entered",values$Ntyp,"dates"))
+    if(values$Ntyp<3) output_choice<-1 else output_choice<-sample.int(3, size=1)
+    
+    if(output_choice==1) # handwritten date
+    {
+      output$imageDate <- renderPlot({
+        plot_handwritten_date(values$dateToType)
+      }, width=200, height = 40 )
+    } else if(output_choice==2) # calendar date
+    {
+      output$imageDate <- renderPlot({
+        plot_calendar_page(values$dateToType)
+      }, width=500, height = 400 ) 
+    }
+    else # text date
+    {
+      output$imageDate <- renderPlot({
+        full_text_date(values$dateToType)
+      }, width=500, height = 200 ) 
+    }
+    
+    # display as new output text the number of dates typed in until now
+    txt2 <- paste("You have entered",values$Ntyp,"dates")
+    # and if an error was made, display it
+    if(values$error) txt1 <- "" else txt1 <- "You have made an error.\n"
+    output$text <- renderText(paste(txt1, txt2))
   })
   
   ########################################
@@ -115,8 +121,8 @@ shinyServer(function(input, output,session) {
   ########################################
   session$onSessionEnded(function() {
     isolate({
-    saveData(values$tabEntries) # save data
-    stopApp}) # make sure app is stopped
+      saveData(values$tabEntries) # save data
+      stopApp}) # make sure app is stopped
   })
   
   ########################################
@@ -145,7 +151,7 @@ saveData <- function(data) { # function to save the contribution
   names(data) <- c("TypedDate","TrueDate")
   
   write.csv(x = data, file = file.path(responsesDir, fileName),
-            row.names = FALSE, quote = TRUE)
+            row.names = FALSE, quote = FALSE)
 }
 
 #######################################
