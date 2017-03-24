@@ -294,7 +294,7 @@ full_text_date<-function(date=as.Date("01/01/2017", format="%d/%m/%Y"), format=c
   }
   
   plot(NULL,xlim=c(0,300),ylim=c(0,50), axes = F, xlab="",ylab="", main="")
-  rect(xleft = 0, xright = 300, ybottom = 0, ytop = 50)
+  # rect(xleft = 0, xright = 300, ybottom = 0, ytop = 50)
   text(labels=written_date,x=150,y=25, cex=2)
 }
 
