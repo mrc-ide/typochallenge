@@ -70,9 +70,6 @@ shinyServer(function(input, output,session) {
       values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y"))))
       nr <- nrow(values$tabEntries)                                                     
       values$error <- (values$tabEntries[nr,1] != values$tabEntries[nr,2])
-      print(values$error)
-      print(values$tabEntries[nr,])
-      
       values$dateToType <- as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
       output$table <- renderTable(values$tabEntries)
       # resetting the entry to be blank after the user clicks the submit button
@@ -103,8 +100,8 @@ shinyServer(function(input, output,session) {
     # display as new output text the number of dates typed in until now
     txt2 <- paste("You have entered",values$Ntyp,"dates")
     # and if an error was made, display it
-    if(values$error) txt1 <- "" else txt1 <- "You have made an error.\n"
-    output$text <- renderText(paste(txt1, txt2))
+    if(!values$error) txt1 <- "" else txt1 <- "You have made an error.\n"
+    output$text <- renderText(paste0(txt1, txt2))
   })
   
   ########################################
