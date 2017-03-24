@@ -55,13 +55,23 @@ shinyServer(function(input, output,session) {
   # once the user enters a date and presses submit #
   ########################################
   
-  values <- reactiveValues(Ntyp = 0, dateToType = as.Date("28/12/2014", "%d/%m/%Y"), flag_page=2, tabEntries = NULL)
+  values <- reactiveValues(Ntyp = 0, lastTimePoint = Sys.time(), shortestEntry=10000, dateToType = as.Date("28/12/2014", "%d/%m/%Y"), flag_page=2, tabEntries = NULL)
   
   tdate <- eventReactive(input$validateButton, {
     input$typedDate
     renderText(input$typedDate)
   })
-  
+
+  #deals with personal statistics
+  observeEvent(input$submit,isolate({
+    pastTimePoint <- values$lastTimePoint
+    values$lastTimePoint <- Sys.time()
+    timeForTyping <- round(values$lastTimePoint-pastTimePoint, digits = 2)
+    if(timeForTyping<values$shortestEntry)  #must also check that entry is correct!
+      values$shortestEntry<-timeForTyping
+    values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y")),dateFormat[values$date_format],timeForTyping))
+  }))
+    
   # increments the number of dates typed in until now
   observeEvent(input$submit,isolate({
     values$Ntyp <- values$Ntyp + 1
@@ -70,7 +80,6 @@ shinyServer(function(input, output,session) {
   observeEvent(input$submit, {
     #saveData(formData())
     isolate({
-      values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y")),dateFormat[values$date_format]))
       # new date to type randomly chosen
       values$dateToType <- as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
       # choose the way the date will be displayed
@@ -121,7 +130,10 @@ shinyServer(function(input, output,session) {
                      "' and you typed in '",
                      values$tabEntries[nrow(values$tabEntries),1],"'.\n\n\n")
     }
-    output$text <- renderText(paste0(txt1, txt2))
+    
+    txt3<-paste("\nYou are taking an average of",round(mean(as.double(values$tabEntries[,4])),digit=2),"s per entry.\nYour personal record for a (correct) entry is",values$shortestEntry,"secondes.")
+    
+    output$text <- renderText(paste0(txt1, txt2,txt3))
   })
   
   ########################################
@@ -190,7 +202,7 @@ saveData <- function(data) { # function to save the contribution
                       digest::digest(data))
   
   data <- as.data.frame(data)
-  names(data) <- c("TypedDate","TrueDate","TrueDateFormat")
+  names(data) <- c("TypedDate","TrueDate","TrueDateFormat","TypingTime")
   
   write.csv(x = data, file = file.path(responsesDir, fileName),
             row.names = FALSE, quote = FALSE)
