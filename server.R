@@ -99,7 +99,7 @@ shinyServer(function(input, output,session) {
     
     # display as new output text the number of dates typed in until now
     txt2 <- paste0(make_title("YOUR STATS"),
-                      "You have entered a total of",values$Ntyp,"dates")
+                      "You have entered a total of ",values$Ntyp," dates")
     # and if an error was made, display it
     if(!values$error) 
     {
@@ -149,9 +149,14 @@ shinyServer(function(input, output,session) {
 ########################################
 make_title <- function(txt)
 {
-  return(paste0("------------------------------------\n               ",txt,"               \n------------------------------------\n"))
+  ntot <- 36
+  nspaces <- (ntot - nchar(txt))/2
+  return(paste0( makeNstr("-",ntot),"\n",
+                  makeNstr(" ", nspaces),
+                  txt,
+                  makeNstr(" ", nspaces),"\n",
+                  makeNstr("-",ntot),"\n"))
 }
-
 
 ########################################
 # saving entries #
