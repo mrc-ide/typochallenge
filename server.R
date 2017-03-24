@@ -34,6 +34,8 @@ shinyServer(function(input, output,session) {
   #   return(action)
   # })
   
+  dateFormat <- c("Handwritten","Calendar","TextDayMonthYear","TextMonthDayYear")
+  
   ########################################
   # initial appearance #
   ########################################
@@ -44,7 +46,8 @@ shinyServer(function(input, output,session) {
   # Initially display a handwritten randomly drawn date
   output$imageDate <- renderPlot({
     values$dateToType<-as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
-    
+    values$date_format <- 1
+    values$final_data_saved <- FALSE
     plot_handwritten_date(values$dateToType)
   }, width=200, height = 40 ) 
   
@@ -67,37 +70,45 @@ shinyServer(function(input, output,session) {
   observeEvent(input$submit, {
     #saveData(formData())
     isolate({
-      values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y"))))
+      values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y")),dateFormat[values$date_format]))
+      # new date to type randomly chosen
       values$dateToType <- as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
+      # choose the way the date will be displayed
+      values$date_format <- sample.int(4, size=1)
+      # provide opportunity to save again
+      values$final_data_saved <- FALSE
+      
       output$table <- renderTable(values$tabEntries)
       # resetting the entry to be blank after the user clicks the submit button
       updateTextInput(session, "typedDate", "Type the date", "") 
     })
     
-    # choose the way the date will be displayed
-    if(values$Ntyp<3) output_choice<-1 else output_choice<-sample.int(3, size=1)
-    
-    if(output_choice==1) # handwritten date
+    if(values$date_format==1) # handwritten date
     {
       output$imageDate <- renderPlot({
         plot_handwritten_date(values$dateToType)
       }, width=200, height = 40 )
-    } else if(output_choice==2) # calendar date
+    } else if(values$date_format==2) # calendar date
     {
       output$imageDate <- renderPlot({
         plot_calendar_page(values$dateToType)
       }, width=500, height = 400 ) 
     }
-    else # text date
+    else if(values$date_format==3) # text date in day month year format
     {
       output$imageDate <- renderPlot({
-        full_text_date(values$dateToType)
+        full_text_date(values$dateToType, format="dmy")
+      }, width=500, height = 200 ) 
+    }else # text date in month day year format
+    {
+      output$imageDate <- renderPlot({
+        full_text_date(values$dateToType, format="mdy")
       }, width=500, height = 200 ) 
     }
     
     # display as new output text the number of dates typed in until now
     txt2 <- paste0(make_title("YOUR STATS"),
-                      "You have entered a total of ",values$Ntyp," dates")
+                   "You have entered a total of ",values$Ntyp," dates")
     # and if an error was made, display it
     if((values$tabEntries[nrow(values$tabEntries),1] == values$tabEntries[nrow(values$tabEntries),2])) 
     {
@@ -105,10 +116,10 @@ shinyServer(function(input, output,session) {
     } else 
     {
       txt1 <- paste0(make_title("TYPO AT LAST ENTRY!"),
-                      "The date was '",
-                      values$tabEntries[nrow(values$tabEntries),2],
-                      "' and you typed in '",
-                      values$tabEntries[nrow(values$tabEntries),1],"'.\n\n\n")
+                     "The date was '",
+                     values$tabEntries[nrow(values$tabEntries),2],
+                     "' and you typed in '",
+                     values$tabEntries[nrow(values$tabEntries),1],"'.\n\n\n")
     }
     output$text <- renderText(paste0(txt1, txt2))
   })
@@ -118,16 +129,26 @@ shinyServer(function(input, output,session) {
   ########################################
   
   # when user presses end of challenge button, save the dates entered up to now in file
-  observeEvent(input$end, {
-    saveData(values$tabEntries)
-  })
+  observeEvent(input$end, isolate({ # save data unless already done
+    if(!values$final_data_saved) 
+    {
+      saveData(values$tabEntries) # save data 
+      values$tabEntries <- NULL # reset entries to nothing, so that if a second set of data is entered it is recorded without the first set which has just been recorded
+      values$final_data_saved <- TRUE # record the fact that we have already saved the data
+    }
+  }))
   
   ########################################
   # what happends if browser is closed #
   ########################################
   session$onSessionEnded(function() {
     isolate({
-      saveData(values$tabEntries) # save data
+      if(!values$final_data_saved) 
+      {
+        saveData(values$tabEntries) # save data 
+        values$tabEntries <- NULL # reset entries to nothing, so that if a second set of data is entered it is recorded without the first set which has just been recorded
+        values$final_data_saved <- TRUE # record the fact that we have already saved the data
+      }
       stopApp}) # make sure app is stopped
   })
   
@@ -149,10 +170,10 @@ make_title <- function(txt)
   ntot <- 36
   nspaces <- (ntot - nchar(txt))/2
   return(paste0( makeNstr("-",ntot),"\n",
-                  makeNstr(" ", nspaces),
-                  txt,
-                  makeNstr(" ", nspaces),"\n",
-                  makeNstr("-",ntot),"\n"))
+                 makeNstr(" ", nspaces),
+                 txt,
+                 makeNstr(" ", nspaces),"\n",
+                 makeNstr("-",ntot),"\n"))
 }
 
 ########################################
@@ -169,7 +190,7 @@ saveData <- function(data) { # function to save the contribution
                       digest::digest(data))
   
   data <- as.data.frame(data)
-  names(data) <- c("TypedDate","TrueDate")
+  names(data) <- c("TypedDate","TrueDate","TrueDateFormat")
   
   write.csv(x = data, file = file.path(responsesDir, fileName),
             row.names = FALSE, quote = FALSE)
@@ -215,6 +236,7 @@ plot_calendar_page <- function(date=as.Date("01/01/2017", format="%d/%m/%Y"), wi
   first_dmonth<-as.POSIXlt(date-date_lt$mday+1)$wday
   
   #opens an empty plotting area
+  par(mar=c(0, 0, 1, 0))
   plot(NULL,xlim=c(0,width),ylim=c(0,height*1.1), axes = F, xlab="",ylab="", main=paste(month,year))
   rect(0,0,width,height)
   
@@ -261,8 +283,10 @@ plot_calendar_page <- function(date=as.Date("01/01/2017", format="%d/%m/%Y"), wi
 #' @export
 #' @examples
 #' plot_calendar_page(Sys.Date()) # show a page with today's date circled in red
-full_text_date<-function(date=as.Date("01/01/2017", format="%d/%m/%Y"))
+full_text_date<-function(date=as.Date("01/01/2017", format="%d/%m/%Y"), format=c("dmy","mdy"))
 {
+  format <- match.arg(format)
+  
   #Names of the calendar months
   month.names <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
   
@@ -270,19 +294,26 @@ full_text_date<-function(date=as.Date("01/01/2017", format="%d/%m/%Y"))
   day.names <- paste0(c("Sun","Mon","Tues","Wednes","Thurs","Fri","Satur"),"day")
   
   #convert the date in the POSIXlt classes
-  date_lt<-as.POSIXlt(date)
+  date_lt <- as.POSIXlt(date)
   
   #derive the suffixe the numeral
-  if(date_lt$mday %in% c(1,21,31)) suf="st" else
-    if(date_lt$mday %in% c(2,22)) suf="nd" else
-      if(date_lt$mday %in% c(3,23)) suf="rd" else
-        suf="th"
+  if(date_lt$mday %in% c(1,21,31)) suf <- "st" else
+    if(date_lt$mday %in% c(2,22)) suf <- "nd" else
+      if(date_lt$mday %in% c(3,23)) suf <- "rd" else
+        suf <- "th"
   
-  written_date <- paste0(day.names[date_lt$wday+1]," ",date_lt$mday,suf," ",month.names[date_lt$mon + 1]," ",date_lt$year+1900)
+  if(format=="dmy")
+  {
+    written_date <- paste0(day.names[date_lt$wday+1]," ",date_lt$mday,suf," ",month.names[date_lt$mon + 1]," ",date_lt$year+1900)
+  }else if(format=="mdy")
+  {
+    written_date <- paste0(day.names[date_lt$wday+1]," ",month.names[date_lt$mon + 1]," ",date_lt$mday,suf," ",date_lt$year+1900)
+  }
   
+  par(mar=c(0, 0, 0, 0))
   plot(NULL,xlim=c(0,300),ylim=c(0,50), axes = F, xlab="",ylab="", main="")
-  rect(xleft = 0, xright = 300, ybottom = 0, ytop = 50)
-  text(labels=written_date,x=150,y=25, cex=2)
+  # rect(xleft = 0, xright = 300, ybottom = 0, ytop = 50)
+  legend("topleft",written_date,bty="n", cex=2)
 }
 
 full_text_date(as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1))
