@@ -34,6 +34,8 @@ shinyServer(function(input, output,session) {
   #   return(action)
   # })
   
+  dateFormat <- c("Handwritten","Calendar","TextDayMonthYear","TextMonthDayYear")
+  
   ########################################
   # initial appearance #
   ########################################
@@ -44,7 +46,7 @@ shinyServer(function(input, output,session) {
   # Initially display a handwritten randomly drawn date
   output$imageDate <- renderPlot({
     values$dateToType<-as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
-    
+    values$date_format <- 1
     plot_handwritten_date(values$dateToType)
   }, width=200, height = 40 ) 
   
@@ -67,28 +69,28 @@ shinyServer(function(input, output,session) {
   observeEvent(input$submit, {
     #saveData(formData())
     isolate({
-      values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y"))))
+      values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y")),dateFormat[values$date_format]))
+      # new date to type randomly chosen
       values$dateToType <- as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
+      # choose the way the date will be displayed
+      values$date_format <- sample.int(4, size=1)
       output$table <- renderTable(values$tabEntries)
       # resetting the entry to be blank after the user clicks the submit button
       updateTextInput(session, "typedDate", "Type the date", "") 
     })
     
-    # choose the way the date will be displayed
-    output_choice<-sample.int(4, size=1)
-    
-    if(output_choice==1) # handwritten date
+    if(values$date_format==1) # handwritten date
     {
       output$imageDate <- renderPlot({
         plot_handwritten_date(values$dateToType)
       }, width=200, height = 40 )
-    } else if(output_choice==2) # calendar date
+    } else if(values$date_format==2) # calendar date
     {
       output$imageDate <- renderPlot({
         plot_calendar_page(values$dateToType)
       }, width=500, height = 400 ) 
     }
-    else if(output_choice==3) # text date in day month year format
+    else if(values$date_format==3) # text date in day month year format
     {
       output$imageDate <- renderPlot({
         full_text_date(values$dateToType, format="dmy")
@@ -174,7 +176,7 @@ saveData <- function(data) { # function to save the contribution
                       digest::digest(data))
   
   data <- as.data.frame(data)
-  names(data) <- c("TypedDate","TrueDate")
+  names(data) <- c("TypedDate","TrueDate","TrueDateFormat")
   
   write.csv(x = data, file = file.path(responsesDir, fileName),
             row.names = FALSE, quote = FALSE)
