@@ -70,7 +70,7 @@ shinyServer(function(input, output,session) {
       values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(values$dateToType)))
       values$dateToType <- as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
       output$table <- renderTable(values$tabEntries)
-      # resetting the entry to be blank after the used clicks the submit button
+      # resetting the entry to be blank after the user clicks the submit button
       updateTextInput(session, "typedDate", "Type the date", "") 
     })
     
@@ -140,6 +140,9 @@ saveData <- function(data) { # function to save the contribution
   fileName <- sprintf("%s_%s.csv",
                       humanTime(),
                       digest::digest(data))
+  
+  data <- as.data.frame(data)
+  names(data) <- c("TypedDate","TrueDate")
   
   write.csv(x = data, file = file.path(responsesDir, fileName),
             row.names = FALSE, quote = TRUE)
