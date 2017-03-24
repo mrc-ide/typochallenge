@@ -47,6 +47,7 @@ shinyServer(function(input, output,session) {
   output$imageDate <- renderPlot({
     values$dateToType<-as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
     values$date_format <- 1
+    values$final_data_saved <- FALSE
     plot_handwritten_date(values$dateToType)
   }, width=200, height = 40 ) 
   
@@ -74,6 +75,9 @@ shinyServer(function(input, output,session) {
       values$dateToType <- as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
       # choose the way the date will be displayed
       values$date_format <- sample.int(4, size=1)
+      # provide opportunity to save again
+      values$final_data_saved <- FALSE
+      
       output$table <- renderTable(values$tabEntries)
       # resetting the entry to be blank after the user clicks the submit button
       updateTextInput(session, "typedDate", "Type the date", "") 
@@ -125,16 +129,17 @@ shinyServer(function(input, output,session) {
   ########################################
   
   # when user presses end of challenge button, save the dates entered up to now in file
-  observeEvent(input$end, {
-    saveData(values$tabEntries)
-  })
-  
+  observeEvent(input$end, isolate({
+    if(!values$final_data_saved) saveData(values$tabEntries) # save data unless already done
+    values$final_data_saved <- TRUE # record the fact that we have already saved the data
+  }))
+
   ########################################
   # what happends if browser is closed #
   ########################################
   session$onSessionEnded(function() {
     isolate({
-      saveData(values$tabEntries) # save data
+      if(!values$final_data_saved) saveData(values$tabEntries) # save data unless already done
       stopApp}) # make sure app is stopped
   })
   
