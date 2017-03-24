@@ -220,6 +220,7 @@ plot_calendar_page <- function(date=as.Date("01/01/2017", format="%d/%m/%Y"), wi
   first_dmonth<-as.POSIXlt(date-date_lt$mday+1)$wday
   
   #opens an empty plotting area
+  par(mar=c(0, 0, 1, 0))
   plot(NULL,xlim=c(0,width),ylim=c(0,height*1.1), axes = F, xlab="",ylab="", main=paste(month,year))
   rect(0,0,width,height)
   
@@ -293,9 +294,10 @@ full_text_date<-function(date=as.Date("01/01/2017", format="%d/%m/%Y"), format=c
     written_date <- paste0(day.names[date_lt$wday+1]," ",month.names[date_lt$mon + 1]," ",date_lt$mday,suf," ",date_lt$year+1900)
   }
   
+  par(mar=c(0, 0, 0, 0))
   plot(NULL,xlim=c(0,300),ylim=c(0,50), axes = F, xlab="",ylab="", main="")
   # rect(xleft = 0, xright = 300, ybottom = 0, ytop = 50)
-  text(labels=written_date,x=150,y=25, cex=2)
+  legend("topleft",written_date,bty="n", cex=2)
 }
 
 full_text_date(as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1))
