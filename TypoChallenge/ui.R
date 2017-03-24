@@ -1,0 +1,30 @@
+library(shiny)
+
+# Define UI for application that draws a histogram
+shinyUI(fluidPage(
+  
+  
+  titlePanel("The Typo Challenge"),
+  sidebarLayout(
+    sidebarPanel(
+    
+      #conditionalPanel(
+      #  condition = "flag_page == 1",
+      #  textInput("typedDate", "Type the date", "")),
+      
+      textInput("typedDate", "Type the date", ""),
+      tags$script('
+        $(document).on("keydown", function (e) {
+                  Shiny.onInputChange("lastkeypresscode", e.keyCode);
+                  });
+                  '),
+      actionButton("submit", "Submit", class = "btn-primary"),
+      actionButton("end", "End the challenge", class = "btn-primary")
+      ),
+    mainPanel(
+      plotOutput("imageDate"),
+      #tableOutput('table'),
+      verbatimTextOutput("text")
+    )
+  )
+))
