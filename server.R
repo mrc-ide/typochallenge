@@ -68,8 +68,6 @@ shinyServer(function(input, output,session) {
     #saveData(formData())
     isolate({
       values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y"))))
-      nr <- nrow(values$tabEntries)                                                     
-      values$error <- (values$tabEntries[nr,1] != values$tabEntries[nr,2])
       values$dateToType <- as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
       output$table <- renderTable(values$tabEntries)
       # resetting the entry to be blank after the user clicks the submit button
@@ -101,19 +99,18 @@ shinyServer(function(input, output,session) {
     txt2 <- paste0(make_title("YOUR STATS"),
                       "You have entered a total of ",values$Ntyp," dates")
     # and if an error was made, display it
-    if(!values$error) 
+    if((values$tabEntries[nrow(values$tabEntries),1] == values$tabEntries[nrow(values$tabEntries),2])) 
     {
       txt1 <- "" 
     } else 
     {
       txt1 <- paste0(make_title("TYPO!"),
                       "The date was '",
-                      values$tabEntries[nr,2],
+                      values$tabEntries[nrow(values$tabEntries),2],
                       "' and you typed in '",
-                      values$tabEntries[nr,1],"'.\n\n\n")
-      
-      output$text <- renderText(paste0(txt1, txt2))
+                      values$tabEntries[nrow(values$tabEntries),1],"'.\n\n\n")
     }
+    output$text <- renderText(paste0(txt1, txt2))
   })
   
   ########################################
