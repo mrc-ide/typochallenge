@@ -104,7 +104,7 @@ shinyServer(function(input, output,session) {
       txt1 <- "" 
     } else 
     {
-      txt1 <- paste0(make_title("TYPO!"),
+      txt1 <- paste0(make_title("TYPO AT LAST ENTRY!"),
                       "The date was '",
                       values$tabEntries[nrow(values$tabEntries),2],
                       "' and you typed in '",
