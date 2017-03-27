@@ -1,38 +1,9 @@
 library(shiny)
+library(shinyjs)
 library(rmnist)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output,session) {
-  
-  ########################################
-  # attempts at making the enter key work as well as submit button #
-  # not working for now #
-  ########################################
-  
-  # # There are state variables for the input text and GO button
-  # curr.val <- "" # Corresponds to the current displayed input$myinput
-  # curr.go  <- 0  # Corresponds to the last known GO value (integer)
-  # 
-  # lastEvent <- reactive({
-  #   # Is reactive to the following events
-  #   input$GO
-  #   input$lastkeypresscode
-  #   
-  #   # Decide which action should be taken
-  #   if(input$GO > curr.go) {
-  #     # The user pushed the GO actionButton, so take action
-  #     action <- 1
-  #     curr.go <<- input$GO
-  #   } else if(input$lastkeypresscode == 13) {
-  #     # The user pressed the Enter key, so take action
-  #     action <- 1
-  #   } else {
-  #     # The user did anything else, so do nothing
-  #     action <- 0
-  #   }
-  #   
-  #   return(action)
-  # })
   
   dateFormat <- c("Handwritten","Calendar","TextDayMonthYear","TextMonthDayYear")
   
@@ -40,7 +11,7 @@ shinyServer(function(input, output,session) {
   # initial appearance #
   ########################################
   
-  # Default output text, which will be changed once the user clicks on the submit button
+  # Default output text, which will be changed once the user enters the first date
   output$text <- renderText("You have not yet started the challenge")
   
   # Initially display a handwritten randomly drawn date
@@ -52,7 +23,7 @@ shinyServer(function(input, output,session) {
   }, width=200, height = 40 ) 
   
   ########################################
-  # once the user enters a date and presses submit #
+  # once the user enters a date and presses enter #
   ########################################
   
   values <- reactiveValues(Ntyp = 0, dateToType = as.Date("28/12/2014", "%d/%m/%Y"), flag_page=2, tabEntries = NULL)
@@ -63,66 +34,68 @@ shinyServer(function(input, output,session) {
   #   renderText(input$typedDate)
   # })
   
-  # increments the number of dates typed in until now
-  observeEvent(input$submit,isolate({
-    values$Ntyp <- values$Ntyp + 1
-  }))
-  
-  observeEvent(input$submit, {
-    #saveData(formData())
-    isolate({
-      values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y")),dateFormat[values$date_format]))
-      # new date to type randomly chosen
-      values$dateToType <- as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
-      # choose the way the date will be displayed
-      values$date_format <- sample.int(4, size=1)
-      # provide opportunity to save again
-      values$final_data_saved <- FALSE
+  onevent("keydown", "typedDate", function(event) {
+    if (event$keyCode == 13) { # once the person presses enter
       
-      output$table <- renderTable(values$tabEntries)
-      # resetting the entry to be blank after the user clicks the submit button
-      updateTextInput(session, "typedDate", "Type the date", "") 
-    })
-    
-    if(values$date_format==1) # handwritten date
-    {
-      output$imageDate <- renderPlot({
-        plot_handwritten_date(values$dateToType)
-      }, width=200, height = 40 )
-    } else if(values$date_format==2) # calendar date
-    {
-      output$imageDate <- renderPlot({
-        plot_calendar_page(values$dateToType)
-      }, width=500, height = 400 ) 
+      # increments the number of dates typed in until now
+      values$Ntyp <- values$Ntyp + 1
+      
+      # record the date typed in and compare with true date
+      #saveData(formData())
+      isolate({
+        values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y")),dateFormat[values$date_format]))
+        # new date to type randomly chosen
+        values$dateToType <- as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
+        # choose the way the date will be displayed
+        values$date_format <- sample.int(4, size=1)
+        # provide opportunity to save again
+        values$final_data_saved <- FALSE
+        
+        output$table <- renderTable(values$tabEntries)
+        # resetting the entry to be blank after the user presses enter
+        updateTextInput(session, "typedDate", "Type the date", "") 
+      })
+      
+      if(values$date_format==1) # handwritten date
+      {
+        output$imageDate <- renderPlot({
+          plot_handwritten_date(values$dateToType)
+        }, width=200, height = 40 )
+      } else if(values$date_format==2) # calendar date
+      {
+        output$imageDate <- renderPlot({
+          plot_calendar_page(values$dateToType)
+        }, width=500, height = 400 ) 
+      }
+      else if(values$date_format==3) # text date in day month year format
+      {
+        output$imageDate <- renderPlot({
+          full_text_date(values$dateToType, format="dmy")
+        }, width=500, height = 200 ) 
+      }else # text date in month day year format
+      {
+        output$imageDate <- renderPlot({
+          full_text_date(values$dateToType, format="mdy")
+        }, width=500, height = 200 ) 
+      }
+      
+      # display as new output text the number of dates typed in until now
+      txt2 <- paste0(make_title("YOUR STATS"),
+                     "You have entered a total of ",values$Ntyp," dates")
+      # and if an error was made, display it
+      if((values$tabEntries[nrow(values$tabEntries),1] == values$tabEntries[nrow(values$tabEntries),2])) 
+      {
+        txt1 <- "" 
+      } else 
+      {
+        txt1 <- paste0(make_title("TYPO AT LAST ENTRY!"),
+                       "The date was '",
+                       values$tabEntries[nrow(values$tabEntries),2],
+                       "' and you typed in '",
+                       values$tabEntries[nrow(values$tabEntries),1],"'.\n\n\n")
+      }
+      output$text <- renderText(paste0(txt1, txt2))
     }
-    else if(values$date_format==3) # text date in day month year format
-    {
-      output$imageDate <- renderPlot({
-        full_text_date(values$dateToType, format="dmy")
-      }, width=500, height = 200 ) 
-    }else # text date in month day year format
-    {
-      output$imageDate <- renderPlot({
-        full_text_date(values$dateToType, format="mdy")
-      }, width=500, height = 200 ) 
-    }
-    
-    # display as new output text the number of dates typed in until now
-    txt2 <- paste0(make_title("YOUR STATS"),
-                   "You have entered a total of ",values$Ntyp," dates")
-    # and if an error was made, display it
-    if((values$tabEntries[nrow(values$tabEntries),1] == values$tabEntries[nrow(values$tabEntries),2])) 
-    {
-      txt1 <- "" 
-    } else 
-    {
-      txt1 <- paste0(make_title("TYPO AT LAST ENTRY!"),
-                     "The date was '",
-                     values$tabEntries[nrow(values$tabEntries),2],
-                     "' and you typed in '",
-                     values$tabEntries[nrow(values$tabEntries),1],"'.\n\n\n")
-    }
-    output$text <- renderText(paste0(txt1, txt2))
   })
   
   ########################################
