@@ -15,7 +15,7 @@ shinyUI(fluidPage(
       #  textInput("typedDate", "Type the date", "")),
       
       useShinyjs(),
-      textInput("typedDate", "Type the date", ""),
+      textInput("typedDate", "Type the date (press enter to submit)", ""),
       tags$script('
         $(document).on("keydown", function (e) {
                   Shiny.onInputChange("lastkeypresscode", e.keyCode);
