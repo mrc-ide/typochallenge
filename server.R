@@ -57,10 +57,11 @@ shinyServer(function(input, output,session) {
   
   values <- reactiveValues(Ntyp = 0, dateToType = as.Date("28/12/2014", "%d/%m/%Y"), flag_page=2, tabEntries = NULL)
   
-  tdate <- eventReactive(input$validateButton, {
-    input$typedDate
-    renderText(input$typedDate)
-  })
+  ### not sure what this is used for
+  # tdate <- eventReactive(input$validateButton, {
+  #   input$typedDate
+  #   renderText(input$typedDate)
+  # })
   
   # increments the number of dates typed in until now
   observeEvent(input$submit,isolate({
