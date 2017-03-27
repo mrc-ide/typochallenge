@@ -399,6 +399,8 @@ plot_handwritten_date <- function(date=as.Date("01/01/2017", format="%d/%m/%Y"),
 #' @examples
 checkDateIsCorrect <- function(typedDate="1/1/2017", date=as.Date("01/01/2017", format="%d/%m/%Y"))
 {
-  if(typedDate=="") return(FALSE)
-  return(as.Date(typedDate, format="%d/%m/%Y")==date)  
+  result<-(as.Date(typedDate, format="%d/%m/%Y")==date)
+  if(is.na(result))
+    return(FALSE) else
+      return(result)
 }
