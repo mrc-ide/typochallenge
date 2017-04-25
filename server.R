@@ -54,7 +54,6 @@ shinyServer(function(input, output,session) {
       # record the date typed in and compare with true date
       #saveData(formData())
       isolate({
-        values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y")),dateFormat[values$date_format],timeForTyping,correctFlag))
         # new date to type randomly chosen
         values$dateToType <- as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
         # choose the way the date will be displayed
