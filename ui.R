@@ -14,13 +14,13 @@ shinyUI(fluidPage(
       #  condition = "flag_page == 1",
       #  textInput("typedDate", "Type the date", "")),
       
-      textInput("typedDate", "Type the date", ""),
+      useShinyjs(),
+      textInput("typedDate", "Type the date (press enter to submit)", ""),
       tags$script('
         $(document).on("keydown", function (e) {
                   Shiny.onInputChange("lastkeypresscode", e.keyCode);
                   });
                   '),
-      actionButton("submit", "Submit", class = "btn-primary"),
       actionButton("end", "End the challenge", class = "btn-primary")
       ),
     mainPanel(
