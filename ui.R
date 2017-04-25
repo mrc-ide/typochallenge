@@ -40,7 +40,12 @@ shinyUI(fluidPage(
         ),
       
       #tableOutput('table'),
-      verbatimTextOutput("text")
+      verbatimTextOutput("text"),
+      
+      conditionalPanel(
+        condition = "output.text != 'You have not yet started the challenge'",
+        verbatimTextOutput("text_stats")
+      )
     )
   )
 ))

@@ -13,10 +13,12 @@ shinyServer(function(input, output,session) {
   
   # Default output text, which will be changed once the user enters the first date
   output$text <- renderText('You have not yet started the challenge')
+  output$text_stats <- renderText('')
   
   observeEvent(input$start,isolate({
     # Default output text, which will be changed once the user enters the first date
-    output$text <- renderText('Challenge ongoing')
+    output$text <- renderText('')
+    output$text_stats <- renderText('')
     
     # Initially display a handwritten randomly drawn date
     output$imageDate <- renderPlot({
@@ -118,7 +120,8 @@ shinyServer(function(input, output,session) {
       else
         txt3<-paste("\nYou have not typed any correct date yet.")
       
-      output$text <- renderText(paste0(txt1, txt2,txt3))
+      output$text <- renderText(txt1)
+      output$text_stats <- renderText(paste0(txt2,txt3))
     }
     
   })
@@ -129,15 +132,29 @@ shinyServer(function(input, output,session) {
   
   # when user presses end of challenge button, save the dates entered up to now in file
   observeEvent(input$end, isolate({ # save data unless already done
+    
+    
+    if(sum(values$tabEntries[,5]==TRUE))
+    {
+      txt2 <- paste0(make_title("YOUR STATS"),
+                     "You have entered a total of ",values$Ntyp," dates (", sum(values$tabEntries[,5]==FALSE), " mistake(s))")
+      txt3<-paste("\nYou have taken an average of",round(mean(as.double(values$tabEntries[values$tabEntries[,5]==TRUE,4])),digit=2),"s per correct entry.\nYour personal record for a (correct) entry is",values$shortestEntry,"seconds.")
+    }
+    else
+    {  
+      txt2 <- "\nYou have not typed any correct date yet."
+      txt3 <- ""
+    }
+    
+    output$text <- renderText('Challenge over, thank you for your participation!')
+    output$text_stats <- renderText(paste0(txt2,txt3))
+    
     if(!values$final_data_saved) 
     {
       saveData(values$tabEntries) # save data 
       values$tabEntries <- NULL # reset entries to nothing, so that if a second set of data is entered it is recorded without the first set which has just been recorded
       values$final_data_saved <- TRUE # record the fact that we have already saved the data
     }
-    
-    output$text <- renderText('Challenge over, thank you for your participation!')
-    output$imageDate <- renderPlot({    }) # empty plot
     
   }))
   
