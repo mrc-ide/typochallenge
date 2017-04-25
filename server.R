@@ -108,7 +108,7 @@ shinyServer(function(input, output,session) {
         
     
       if(sum(values$tabEntries[,5]==TRUE))
-        txt3<-paste("\nYou are taking an average of",round(mean(as.double(values$tabEntries[values$tabEntries[,5]==TRUE,4])),digit=2),"s per correct entry.\nYour personal record for a (correct) entry is",values$shortestEntry,"secondes.")
+        txt3<-paste("\nYou are taking an average of",round(mean(as.double(values$tabEntries[values$tabEntries[,5]==TRUE,4])),digit=2),"s per correct entry.\nYour personal record for a (correct) entry is",values$shortestEntry,"seconds.")
       else
         txt3<-paste("\nYou have not typed any correct date yet.")
     
