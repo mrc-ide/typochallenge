@@ -152,7 +152,7 @@ shinyServer(function(input, output,session) {
     }
     else
     {  
-      txt2 <- "\nYou have not typed any correct date yet."
+      txt2 <- "You have not typed any correct date..."
       txt3 <- ""
     }
     
