@@ -13,7 +13,17 @@ shinyServer(function(input, output,session) {
   
   # Default output text, which will be changed once the user enters the first date
   output$text <- renderText('You have not yet started the challenge')
-  output$text_stats <- renderText('')
+  instructions <- paste0(make_title("INSTRUCTIONS"),
+                 "You are going to be presented with dates, in various formats.\n\n",
+                 "You need to enter these dates in the format 'dd/mm/yyyy'.\n", 
+                 "For instance, if the date is '25th of April 2017, you need to type in '25/04/2017'.\n", 
+                 "Note that '25/4/2017' will also be accepted as a correct entry.\n\n",
+                 "To validate an entry, type the 'Enter' button. \n",
+                 "You will then be prompted with a new date to enter. \n\n",
+                 "You can stop at any point, by clicking on 'End the challenge'.\n\n",
+                 "To start the challenge, click on 'Start the challenge'. \n",
+                 "Good luck!")
+  output$text_instructions <- renderText(instructions)
   
   observeEvent(input$start,isolate({
     # Default output text, which will be changed once the user enters the first date
