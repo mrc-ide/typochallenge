@@ -26,7 +26,7 @@ shinyServer(function(input, output,session) {
   # once the user enters a date and presses enter #
   ########################################
   
-  values <- reactiveValues(Ntyp = 0, dateToType = as.Date("28/12/2014", "%d/%m/%Y"), flag_page=2, tabEntries = NULL)
+  values <- reactiveValues(Ntyp = 0, lastTimePoint = Sys.time(), shortestEntry=10000, dateToType = as.Date("28/12/2014", "%d/%m/%Y"), flag_page=2, tabEntries = NULL)
   
   ### not sure what this is used for
   # tdate <- eventReactive(input$validateButton, {
@@ -37,13 +37,24 @@ shinyServer(function(input, output,session) {
   onevent("keydown", "typedDate", function(event) {
     if (event$keyCode == 13) { # once the person presses enter
       
+      #deals with personal statistics
+      observeEvent(input$submit,isolate({
+        pastTimePoint <- values$lastTimePoint
+        values$lastTimePoint <- Sys.time()
+        timeForTyping <- round(values$lastTimePoint-pastTimePoint, digits = 2)
+        correctFlag<-checkDateIsCorrect(input$typedDate,values$dateToType)
+        if((timeForTyping<values$shortestEntry)&correctFlag)  #must also check that entry is correct!
+          values$shortestEntry<-timeForTyping
+        values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y")),dateFormat[values$date_format],timeForTyping,correctFlag))
+      }))
+      
       # increments the number of dates typed in until now
       values$Ntyp <- values$Ntyp + 1
       
       # record the date typed in and compare with true date
       #saveData(formData())
       isolate({
-        values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y")),dateFormat[values$date_format]))
+        values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y")),dateFormat[values$date_format],timeForTyping,correctFlag))
         # new date to type randomly chosen
         values$dateToType <- as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
         # choose the way the date will be displayed
@@ -81,9 +92,9 @@ shinyServer(function(input, output,session) {
       
       # display as new output text the number of dates typed in until now
       txt2 <- paste0(make_title("YOUR STATS"),
-                     "You have entered a total of ",values$Ntyp," dates")
+                     "You have entered a total of ",values$Ntyp," dates (", sum(values$tabEntries[,5]==FALSE), " mistake(s) so far)")
       # and if an error was made, display it
-      if((values$tabEntries[nrow(values$tabEntries),1] == values$tabEntries[nrow(values$tabEntries),2])) 
+      if(values$tabEntries[nrow(values$tabEntries),5]) 
       {
         txt1 <- "" 
       } else 
@@ -94,8 +105,17 @@ shinyServer(function(input, output,session) {
                        "' and you typed in '",
                        values$tabEntries[nrow(values$tabEntries),1],"'.\n\n\n")
       }
-      output$text <- renderText(paste0(txt1, txt2))
+      
+        
+    
+      if(sum(values$tabEntries[,5]==TRUE))
+        txt3<-paste("\nYou are taking an average of",round(mean(as.double(values$tabEntries[values$tabEntries[,5]==TRUE,4])),digit=2),"s per correct entry.\nYour personal record for a (correct) entry is",values$shortestEntry,"secondes.")
+      else
+        txt3<-paste("\nYou have not typed any correct date yet.")
+    
+      output$text <- renderText(paste0(txt1, txt2,txt3))
     }
+
   })
   
   ########################################
@@ -164,7 +184,7 @@ saveData <- function(data) { # function to save the contribution
                       digest::digest(data))
   
   data <- as.data.frame(data)
-  names(data) <- c("TypedDate","TrueDate","TrueDateFormat")
+  names(data) <- c("TypedDate","TrueDate","TrueDateFormat","TypingTime","TypedCorrectly")
   
   write.csv(x = data, file = file.path(responsesDir, fileName),
             row.names = FALSE, quote = FALSE)
@@ -340,4 +360,23 @@ plot_handwritten_date <- function(date=as.Date("01/01/2017", format="%d/%m/%Y"),
     plot(chosen_image_unique[[match(idx, date_idx_unique)]], box=FALSE)
   }
   
+}
+
+#############################################
+### function to validate a typed date     ###
+#############################################
+
+#' Plots a handwritten date
+#' 
+#' @param typedDate A character vector
+#' @param date A date
+#' @return True or False
+#' @export
+#' @examples
+checkDateIsCorrect <- function(typedDate="1/1/2017", date=as.Date("01/01/2017", format="%d/%m/%Y"))
+{
+  result<-(as.Date(typedDate, format="%d/%m/%Y")==date)
+  if(is.na(result))
+    return(FALSE) else
+      return(result)
 }
