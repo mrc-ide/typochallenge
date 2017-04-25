@@ -4,25 +4,34 @@ library(Hmisc)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
-  
-  
+
   titlePanel("The Typo Challenge"),
   sidebarLayout(
     sidebarPanel(
-    
-      #conditionalPanel(
-      #  condition = "flag_page == 1",
-      #  textInput("typedDate", "Type the date", "")),
       
       useShinyjs(),
-      textInput("typedDate", "Type the date (press enter to submit)", ""),
-      tags$script('
+      
+      ### Initial panel, before the challenge is started ###
+      conditionalPanel(
+        condition = "output.text == 'You have not yet started the challenge'",
+        actionButton("start", "Start the challenge", class = "btn-primary")
+      ),
+      
+      ### Susequent panel, once the challenge is started ###
+      conditionalPanel(
+        condition = "output.text != 'You have not yet started the challenge'",
+        textInput("typedDate", "Type the date (press enter to submit)", ""),
+        
+        tags$script('
         $(document).on("keydown", function (e) {
                   Shiny.onInputChange("lastkeypresscode", e.keyCode);
                   });
                   '),
-      actionButton("end", "End the challenge", class = "btn-primary")
-      ),
+        actionButton("end", "End the challenge", class = "btn-primary"))
+      
+      ### Final panel, once the challenge is over ###
+      
+    ),
     mainPanel(
       plotOutput("imageDate"),
       #tableOutput('table'),

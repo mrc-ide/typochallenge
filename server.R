@@ -12,15 +12,21 @@ shinyServer(function(input, output,session) {
   ########################################
   
   # Default output text, which will be changed once the user enters the first date
-  output$text <- renderText("You have not yet started the challenge")
+  output$text <- renderText('You have not yet started the challenge')
   
-  # Initially display a handwritten randomly drawn date
-  output$imageDate <- renderPlot({
-    values$dateToType<-as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
-    values$date_format <- 1
-    values$final_data_saved <- FALSE
-    plot_handwritten_date(values$dateToType)
-  }, width=200, height = 40 ) 
+  observeEvent(input$start,isolate({
+    # Default output text, which will be changed once the user enters the first date
+    output$text <- renderText('Challenge ongoing')
+    
+    # Initially display a handwritten randomly drawn date
+    output$imageDate <- renderPlot({
+      values$dateToType<-as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
+      values$date_format <- 1
+      values$final_data_saved <- FALSE
+      plot_handwritten_date(values$dateToType)
+    }, width=200, height = 40 ) 
+    
+  }))
   
   ########################################
   # once the user enters a date and presses enter #
@@ -105,16 +111,16 @@ shinyServer(function(input, output,session) {
                        values$tabEntries[nrow(values$tabEntries),1],"'.\n\n\n")
       }
       
-        
-    
+      
+      
       if(sum(values$tabEntries[,5]==TRUE))
         txt3<-paste("\nYou are taking an average of",round(mean(as.double(values$tabEntries[values$tabEntries[,5]==TRUE,4])),digit=2),"s per correct entry.\nYour personal record for a (correct) entry is",values$shortestEntry,"seconds.")
       else
         txt3<-paste("\nYou have not typed any correct date yet.")
-    
+      
       output$text <- renderText(paste0(txt1, txt2,txt3))
     }
-
+    
   })
   
   ########################################
@@ -151,6 +157,8 @@ shinyServer(function(input, output,session) {
   ### what happens if the server crashes? 
   ### maybe save temp files every 10 entries so we don't loose too much data 
   ### if people type in a large number of dates and server crashes or they loose connection 
+  
+  outputOptions(output, "text", suspendWhenHidden = FALSE)
   
 })
 
