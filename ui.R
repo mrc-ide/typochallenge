@@ -33,7 +33,12 @@ shinyUI(fluidPage(
       
     ),
     mainPanel(
-      plotOutput("imageDate"),
+      
+      conditionalPanel(
+        condition = "output.text != 'You have not yet started the challenge' && output.text != 'Challenge over, thank you for your participation!'",
+        plotOutput("imageDate")
+        ),
+      
       #tableOutput('table'),
       verbatimTextOutput("text")
     )
