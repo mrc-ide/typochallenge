@@ -135,6 +135,10 @@ shinyServer(function(input, output,session) {
       values$tabEntries <- NULL # reset entries to nothing, so that if a second set of data is entered it is recorded without the first set which has just been recorded
       values$final_data_saved <- TRUE # record the fact that we have already saved the data
     }
+    
+    output$text <- renderText('Challenge over, thank you for your participation!')
+    output$imageDate <- renderPlot({    }) # empty plot
+    
   }))
   
   ########################################

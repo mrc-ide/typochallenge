@@ -19,7 +19,7 @@ shinyUI(fluidPage(
       
       ### Susequent panel, once the challenge is started ###
       conditionalPanel(
-        condition = "output.text != 'You have not yet started the challenge'",
+        condition = "output.text != 'You have not yet started the challenge' && output.text != 'Challenge over, thank you for your participation!'",
         textInput("typedDate", "Type the date (press enter to submit)", ""),
         
         tags$script('
