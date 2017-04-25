@@ -38,7 +38,7 @@ shinyServer(function(input, output,session) {
     if (event$keyCode == 13) { # once the person presses enter
       
       #deals with personal statistics
-      observeEvent(input$submit,isolate({
+      isolate({
         pastTimePoint <- values$lastTimePoint
         values$lastTimePoint <- Sys.time()
         timeForTyping <- round(values$lastTimePoint-pastTimePoint, digits = 2)
@@ -46,7 +46,7 @@ shinyServer(function(input, output,session) {
         if((timeForTyping<values$shortestEntry)&correctFlag)  #must also check that entry is correct!
           values$shortestEntry<-timeForTyping
         values$tabEntries <- rbind(values$tabEntries,c(input$typedDate,as.character(format(values$dateToType, "%d/%m/%Y")),dateFormat[values$date_format],timeForTyping,correctFlag))
-      }))
+      })
       
       # increments the number of dates typed in until now
       values$Ntyp <- values$Ntyp + 1
