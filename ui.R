@@ -1,4 +1,5 @@
 library(shiny)
+library(shinyjs)
 library(rmnist)
 library(Hmisc)
 
