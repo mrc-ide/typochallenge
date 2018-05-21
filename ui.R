@@ -21,14 +21,15 @@ shinyUI(fluidPage(
       ### Susequent panel, once the challenge is started ###
       conditionalPanel(
         condition = "output.text != 'You have not yet started the challenge' && output.text != 'Challenge over, thank you for your participation!'",
-        textInput("typedDate", "Type the date (press enter to submit)", ""),
+        textInput("typedDate", "Type the date", ""),
         
         tags$script('
         $(document).on("keydown", function (e) {
                   Shiny.onInputChange("lastkeypresscode", e.keyCode);
                   });
                   '),
-        actionButton("end", "End the challenge", class = "btn-primary"))
+        fluidRow("Press enter to submit", style = "margin-left: 0px;"),
+        actionButton("end", "End the challenge", class = "btn-primary", style = "margin-top: 100px;"))
       
       ### Final panel, once the challenge is over ###
       
