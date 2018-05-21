@@ -12,15 +12,33 @@ shinyServer(function(input, output,session) {
   ########################################
   
   # Default output text, which will be changed once the user enters the first date
-  output$text <- renderText("You have not yet started the challenge")
+  output$text <- renderText('You have not yet started the challenge')
+  instructions <- paste0(make_title("INSTRUCTIONS"),
+                 "You are going to be presented with dates, in various formats.\n\n",
+                 "You need to enter these dates in the format 'dd/mm/yyyy'.\n", 
+                 "For instance, if the date is '25th of April 2017, you need to type in '25/04/2017'.\n", 
+                 "Note that '25/4/2017' will also be accepted as a correct entry.\n\n",
+                 "To validate an entry, type the 'Enter' button. \n",
+                 "You will then be prompted with a new date to enter. \n\n",
+                 "You can stop at any point, by clicking on 'End the challenge'.\n\n",
+                 "To start the challenge, click on 'Start the challenge'. \n",
+                 "Good luck!")
+  output$text_instructions <- renderText(instructions)
   
-  # Initially display a handwritten randomly drawn date
-  output$imageDate <- renderPlot({
-    values$dateToType<-as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
-    values$date_format <- 1
-    values$final_data_saved <- FALSE
-    plot_handwritten_date(values$dateToType)
-  }, width=200, height = 40 ) 
+  observeEvent(input$start,isolate({
+    # Default output text, which will be changed once the user enters the first date
+    output$text <- renderText('')
+    output$text_stats <- renderText('')
+    
+    # Initially display a handwritten randomly drawn date
+    output$imageDate <- renderPlot({
+      values$dateToType<-as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1)
+      values$date_format <- 1
+      values$final_data_saved <- FALSE
+      plot_handwritten_date(values$dateToType)
+    }, width=200, height = 40 ) 
+    
+  }))
   
   ########################################
   # once the user enters a date and presses enter #
@@ -105,16 +123,17 @@ shinyServer(function(input, output,session) {
                        values$tabEntries[nrow(values$tabEntries),1],"'.\n\n\n")
       }
       
-        
-    
+      
+      
       if(sum(values$tabEntries[,5]==TRUE))
         txt3<-paste("\nYou are taking an average of",round(mean(as.double(values$tabEntries[values$tabEntries[,5]==TRUE,4])),digit=2),"s per correct entry.\nYour personal record for a (correct) entry is",values$shortestEntry,"seconds.")
       else
         txt3<-paste("\nYou have not typed any correct date yet.")
-    
-      output$text <- renderText(paste0(txt1, txt2,txt3))
+      
+      output$text <- renderText(txt1)
+      output$text_stats <- renderText(paste0(txt2,txt3))
     }
-
+    
   })
   
   ########################################
@@ -123,12 +142,30 @@ shinyServer(function(input, output,session) {
   
   # when user presses end of challenge button, save the dates entered up to now in file
   observeEvent(input$end, isolate({ # save data unless already done
+    
+    
+    if(sum(values$tabEntries[,5]==TRUE))
+    {
+      txt2 <- paste0(make_title("YOUR STATS"),
+                     "You have entered a total of ",values$Ntyp," dates (", sum(values$tabEntries[,5]==FALSE), " mistake(s))")
+      txt3<-paste("\nYou have taken an average of",round(mean(as.double(values$tabEntries[values$tabEntries[,5]==TRUE,4])),digit=2),"s per correct entry.\nYour personal record for a (correct) entry is",values$shortestEntry,"seconds.")
+    }
+    else
+    {  
+      txt2 <- "You have not typed any correct date..."
+      txt3 <- ""
+    }
+    
+    output$text <- renderText('Challenge over, thank you for your participation!')
+    output$text_stats <- renderText(paste0(txt2,txt3))
+    
     if(!values$final_data_saved) 
     {
       saveData(values$tabEntries) # save data 
       values$tabEntries <- NULL # reset entries to nothing, so that if a second set of data is entered it is recorded without the first set which has just been recorded
       values$final_data_saved <- TRUE # record the fact that we have already saved the data
     }
+    
   }))
   
   ########################################
@@ -151,6 +188,8 @@ shinyServer(function(input, output,session) {
   ### what happens if the server crashes? 
   ### maybe save temp files every 10 entries so we don't loose too much data 
   ### if people type in a large number of dates and server crashes or they loose connection 
+  
+  outputOptions(output, "text", suspendWhenHidden = FALSE)
   
 })
 
