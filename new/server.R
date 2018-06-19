@@ -132,7 +132,7 @@ end_panel <- function() {
        a("", 
          href = 'https://twitter.com/share',
          img(src='./twitter.png',  
-             width = "50px", height = "50px"))),
+             width = "100px", height = "30px"))),
     shiny::includeMarkdown("doc_end.md"),
     shiny::actionButton("restart", "Restart challenge?", class = "btn-primary"))
 }
