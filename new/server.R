@@ -46,6 +46,9 @@ challenge_panel <- function() {
       shiny::hr(),
       shiny::actionButton("end", "End the challenge", class = "btn-danger")),
     shiny::mainPanel(
+      shiny::tags$script(
+        '$("#challenge_date").keydown(function(event) {
+      if (event.keyCode === 13) { $("#challenge_submit").click(); }});'),
       shiny::plotOutput("date_image"),
       shiny::uiOutput("date_prev")))
 }
