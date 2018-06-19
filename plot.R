@@ -11,64 +11,93 @@
 #' @export
 #' @examples
 #' plot_calendar_page(Sys.Date()) # show a page with today's date circled in red
-plot_calendar_page <- function(date=as.Date("01/01/2017", format="%d/%m/%Y"), width=500, height=400) # date has to be a date
+plot_calendar_page <- function(date = as.Date("01/01/2017", 
+                                              format = "%d/%m/%Y"), 
+                               width = 500, 
+                               height = 400) 
 {
   
-  #Names of the week days
-  day.names <- paste0(c("Sun","Mon","Tues","Wednes","Thurs","Fri","Satur"),"day")
+  if (class(date) != "Date"){
+    stop("date should be in date format.") # date has to be a date
+  }
   
-  #convert the date in the POSIXlt classes
-  date_lt<-as.POSIXlt(date)
+  # Names of the week days
+  day_names <- paste0(c("Sun", "Mon", "Tues",
+                        "Wednes", "Thurs", "Fri",
+                        "Satur"), 
+                      "day")
   
-  #Get the month of the date (numeric 0:11) and convert into character
-  month=month.name[date_lt$mon+1]
+  # convert the date in the POSIXlt classes
+  date_lt <- as.POSIXlt(date)
   
-  #Get the weekday of the date (numeric 0:6) 
-  wday=date_lt$wday+1
+  # Get the month of the date (numeric 0:11) and convert into character
+  month <- month.name[date_lt$mon + 1]
   
-  #Get the monthday of the date (numeric 1:31)
-  mday=date_lt$mday
+  # Get the weekday of the date (numeric 0:6) 
+  wday <- date_lt$wday + 1
   
-  #Get the year of the date (numeric year-1900) and convert into character
-  year=as.character(date_lt$year+1900)
+  # Get the monthday of the date (numeric 1:31)
+  mday <- date_lt$mday
   
-  #Calculate the weekday of the first day of the month
-  first_dmonth<-as.POSIXlt(date-date_lt$mday+1)$wday
+  # Get the year of the date (numeric year-1900) and convert into character
+  year <- as.character(date_lt$year + 1900)
   
-  #opens an empty plotting area
-  par(mar=c(0, 0, 1, 0))
-  plot(NULL,xlim=c(0,width),ylim=c(0,height*1.1), axes = F, xlab="",ylab="", main=paste(month,year))
-  rect(0,0,width,height)
+  # Calculate the weekday of the first day of the month
+  first_dmonth <- as.POSIXlt(date-date_lt$mday + 1)$wday
   
-  #Write the days of the week on top of the page
-  text(labels=day.names,(1:7-0.5)*width/7,height,pos=3,cex=.8)
+  # opens an empty plotting area
+  par(mar = c(0, 0, 1, 0))
+  plot(NULL, 
+       xlim = c(0, width), ylim = c(0, height * 1.1), 
+       axes = FALSE, 
+       xlab = "", ylab="", 
+       main = paste(month, year))
+  rect(0, 0, width, height)
   
-  #test if the calendar needs five or six rows
-  if(as.POSIXlt(date-as.POSIXlt(date)$mday-first_dmonth+36)$mon==date_lt$mon)
-    nrow=6 else nrow=5
+  # Write the days of the week on top of the page
+  text(labels = day_names, (1:7-0.5) * width / 7, height, pos = 3, cex = .8)
   
-  #Plot the days in the calendar
-  for(i in 1:7)
-    for(j in 1:nrow)
-    {
+  # test if the calendar needs five or six rows
+  last_day_of_previous_month <- date - as.POSIXlt(date)$mday
+  remaining_from_previous_month <- first_dmonth
+  if(as.POSIXlt(last_day_of_previous_month - 
+                remaining_from_previous_month + 5 * 7 + 1)$mon == date_lt$mon){
+    nrow <- 6 # if still in same month after 5 rows ( = weeks) need a 6th row
+  } else{
+      nrow <- 5
+  } 
+  
+  # may be nice to do this not in a loop but dates and matrices not friends
+  # Plot the days in the calendar
+  for (i in 1:7){
+    for (j in 1:nrow){
       #Calculate the day corresponding to the position in the calendar
-      current_day<-as.POSIXlt(date-as.POSIXlt(date)$mday-first_dmonth+i+(j-1)*7)
+      current_day <- as.POSIXlt(date - as.POSIXlt(date)$mday - first_dmonth +
+                                  i + (j - 1) * 7)
       
-      if(current_day$mon==date_lt$mon)
-        dcol="black" else dcol="grey"
-        text(labels=current_day$mday,x=(i-0.5)*width/7,y=height-(j-0.5)*height/nrow,col=dcol)
+      if(current_day$mon == date_lt$mon)
+        dcol <- "black" else dcol <- "grey"
+        text(labels = current_day$mday,
+             x = (i - 0.5) * width / 7,
+             y = height - (j - 0.5) * height / nrow, 
+             col = dcol)
         
-        if(current_day==date_lt)
-          points(x=(i-0.5)*width/7,y=height-(j-0.5)*height/nrow,col="red",pch=1,cex=5.5,lwd=4)
+        if(current_day == date_lt)
+          points(x = (i - 0.5) * width / 7,
+                 y = height - (j - 0.5) * height / nrow,
+                 col = "red", pch = 1, cex = 5.5, lwd = 4)
     }
+  }
   
   #plot the vertical lines
-  for(i in 1:6)
-    lines(rep(i*width/7,2),c(0,height))
+  for (i in 1:6) {
+    lines(rep(i * width / 7, 2), c(0, height))
+  }
   
   #plot the horizontal lines
-  for(i in 1:(nrow-1))
-    lines(c(0,width),rep(i*height/nrow,2))  
+  for (i in 1:(nrow - 1)) {
+    lines(c(0, width),rep(i * height / nrow, 2))  
+  }
   
 }
 
@@ -91,7 +120,7 @@ full_text_date<-function(date=as.Date("01/01/2017", format="%d/%m/%Y"), format=c
   month.name <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
   
   #Names of the week days
-  day.names <- paste0(c("Sun","Mon","Tues","Wednes","Thurs","Fri","Satur"),"day")
+  day_names <- paste0(c("Sun","Mon","Tues","Wednes","Thurs","Fri","Satur"),"day")
   
   #convert the date in the POSIXlt classes
   date_lt <- as.POSIXlt(date)
@@ -104,10 +133,10 @@ full_text_date<-function(date=as.Date("01/01/2017", format="%d/%m/%Y"), format=c
   
   if(format=="dmy")
   {
-    written_date <- paste0(day.names[date_lt$wday+1]," ",date_lt$mday,suf," ",month.name[date_lt$mon + 1]," ",date_lt$year+1900)
+    written_date <- paste0(day_names[date_lt$wday+1]," ",date_lt$mday,suf," ",month.name[date_lt$mon + 1]," ",date_lt$year+1900)
   }else if(format=="mdy")
   {
-    written_date <- paste0(day.names[date_lt$wday+1]," ",month.name[date_lt$mon + 1]," ",date_lt$mday,suf," ",date_lt$year+1900)
+    written_date <- paste0(day_names[date_lt$wday+1]," ",month.name[date_lt$mon + 1]," ",date_lt$mday,suf," ",date_lt$year+1900)
   }
   
   par(mar=c(0, 0, 0, 0))
