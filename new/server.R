@@ -36,12 +36,13 @@ challenge_panel <- function() {
     shiny::sidebarPanel(
       shiny::textInput("challenge_date", "Type the date", ""),
       ## shiny::fluidRow("Press enter to submit", style = "margin-left: 0px;"),
-      shiny::actionButton("submit", "Submit this answer",
+      shiny::actionButton("challenge_submit", "Submit this answer",
                           class = "btn-primary"),
       shiny::hr(),
       shiny::actionButton("end", "End the challenge", class = "btn-danger")),
     shiny::mainPanel(
-      shiny::plotOutput("date_image")))
+      shiny::plotOutput("date_image"),
+      shiny::uiOutput("date_prev")))
 }
 
 
@@ -52,12 +53,42 @@ end_panel <- function() {
 
 
 next_date <- function() {
-  runif(20)
+  list(value = runif(20))
+}
+
+
+validate_date <- function(given, data) {
+  correct <- runif(1) < 0.5
+  list(correct = correct,
+       real = data$value,
+       given = given)
 }
 
 
 render_date <- function(date) {
-  shiny::renderPlot(plot(date))
+  shiny::renderPlot(plot(date$value))
+}
+
+
+render_prev <- function(prev, stats) {
+  if (!is.null(prev)) {
+    ## common <- sprintf("You have entered %s / %s correctly",
+    ##                   stats$correct, stats$total)
+    if (prev$correct) {
+      title <- "Last entry was correct"
+      body <- "Message on success"
+      type <- "success"
+    } else {
+      title <- "Typo in previous entry"
+      ## body <- sprintf("You entered '%s' but the date was '%s'", prev$
+      body <- "Message on failure"
+      type <- "danger"
+    }
+    shiny::div(
+      class = sprintf("panel panel-%s", type),
+      shiny::div(class = "panel-heading",title),
+      shiny::div(class = "panel-body", body))
+  }
 }
 
 
@@ -87,14 +118,23 @@ shiny::shinyServer(
       })
 
     shiny::observeEvent(
-      input$submit, {
+      input$challenge_submit, {
         message("submitting!")
-        values$date <- next_date()
+        isolate({
+          values$prev <- validate_date(input$challenge_date, values$date)
+          values$date <- next_date()
+        })
       })
 
     shiny::observe({
       if (!is.null(values$date)) {
         output$date_image <- render_date(values$date)
+      }
+    })
+
+    shiny::observe({
+      if (!is.null(values$prev)) {
+        output$date_prev <- shiny::renderUI(render_prev(values$prev))
       }
     })
 
