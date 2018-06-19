@@ -66,20 +66,22 @@ survey_panel <- function() {
       shiny::radioButtons(
         "gender",
         "Please select your gender",
-        c("Male",
+        c("Prefer not to say",
+          "Male",
           "Female",
-          "Other",
-          "Prefer not to say"),
+          "Other"),
         selected = NA),
       
       shiny::selectInput("year_birth", "Please select your year of birth:", 
-                         choices = 2018:1900),
+                         choices = c("Prefer not to say", 2018:1900)),
       
       shiny::selectInput("country_from", "Where are you from?", 
-                         choices = rworldmap::countryExData[ , 2]),
+                         choices = c("Prefer not to say", 
+                                     rworldmap::countryExData[ , 2])),
       
       shiny::selectInput("country_residence", "Where do you currently live?", 
-                         choices = rworldmap::countryExData[ , 2]),
+                         choices = c("Prefer not to say", 
+                                     rworldmap::countryExData[ , 2])),
       
       shiny::radioButtons(
         "survey_keyboard_layout",
