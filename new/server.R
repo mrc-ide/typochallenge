@@ -109,10 +109,23 @@ render_prev <- function(prev, data) {
                       prev$user, date_real)
       type <- "danger"
     }
-    body_stats <- sprintf("This answer: %ss, best time, %ss, average %ss",
-                          round(prev$elapsed, 2),
-                          round(data$time_best, 2),
-                          round(data$time_total / length(data$rows), 2))
+
+    n_entered <- length(data$rows)
+    if (is.null(data$time_best)) {
+      body_stats <- sprintf(
+        "You have not recorded any correct dates (out of %d %s)",
+        n_entered, ngettext(n_entered, "try", "tries"))
+    } else {
+      s1 <- sprintf(
+        "You have recorded %d correct %s (out of %d %s)",
+        data$n_correct, ngettext(data$n_correct, "date", "dates"),
+        n_entered, ngettext(n_entered, "try", "tries"))
+      s2 <- sprintf("This answer: %ss, best time, %ss, average %ss",
+                    round(prev$elapsed, 2),
+                    round(data$time_best, 2),
+                    round(data$time_total / n_entered, 2))
+      body_stats <- paste(s1, s2)
+    }
 
     shiny::div(
       class = "panel-group",
@@ -129,19 +142,21 @@ render_prev <- function(prev, data) {
 
 
 update_data <- function(prev, data) {
-  keep <- names(data_cols)
-  if (is.null(data$time_best)) {
-    time_best <- prev$elapsed
-    time_total <- time_best
-  } else {
-    time_best <- min(prev$elapsed, data$time_best)
-    time_total <- prev$elapsed + data$time_total
+  if (prev$correct) {
+    if (is.null(data$time_best)) {
+      data$time_best <- prev$elapsed
+      data$time_total <- prev$elapsed
+      data$n_correct <- 1L
+    } else {
+      data$time_best <- min(prev$elapsed, data$time_best)
+      data$time_total <- prev$elapsed + data$time_total
+      data$n_correct <- data$n_correct + 1L
+    }
   }
-  prev$date <- format(prev$date, "%d/%m/%Y")
 
-  list(rows = c(data$rows, list(prev[keep])),
-       time_best = time_best,
-       time_total = time_total)
+  prev$date <- format(prev$date, "%d/%m/%Y")
+  data$rows <- c(data$rows, list(prev[names(data_cols)]))
+  data
 }
 
 init_data <- function(values) {
