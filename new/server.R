@@ -36,9 +36,9 @@ read_contribution <- function(p) {
   if (any(i)) {
     t <- d$data$elapsed[i]
     ret <- c(total = length(i),
-      correct = sum(i),
-      best = min(t),
-      mean = mean(t))
+             correct = sum(i),
+             best = min(t),
+             mean = mean(t))
   } else {
     ret <- NULL
   }
@@ -98,7 +98,7 @@ survey_panel <- function() {
           "Numeric keypad (purple keys in image, on right)",
           "A bit of both, I am uncontrollable"),
         selected = NA),
-
+      
       shiny::hr(),
       shiny::actionButton("challenge", "To the typos!", class = "btn-primary")),
     shiny::mainPanel(
@@ -128,6 +128,9 @@ challenge_panel <- function() {
 
 end_panel <- function() {
   shiny::tagList(
+    h5("Invite your friends to participate!", 
+       a("Share on twitter", 
+         href = 'https://twitter.com/share')),
     shiny::includeMarkdown("doc_end.md"),
     shiny::actionButton("restart", "Restart challenge?", class = "btn-primary"))
 }
@@ -158,10 +161,10 @@ render_prev <- function(prev, data, global) {
     } else {
       title <- "Typo in previous entry"
       body_feedback <- sprintf("You entered '%s' but the real date was '%s'",
-                      prev$user, date_real)
+                               prev$user, date_real)
       type <- "danger"
     }
-
+    
     n_entered <- length(data$rows)
     if (is.null(data$time_best)) {
       body_stats <- sprintf(
@@ -187,7 +190,7 @@ render_prev <- function(prev, data, global) {
       }
       body_stats <- paste(s1, s2, s3)
     }
-
+    
     shiny::div(
       class = "panel-group",
       shiny::div(
@@ -214,7 +217,7 @@ update_data <- function(prev, data) {
       data$n_correct <- data$n_correct + 1L
     }
   }
-
+  
   prev$date <- format(prev$date, "%d/%m/%Y")
   data$rows <- c(data$rows, list(prev[names(data_cols)]))
   data
@@ -237,14 +240,14 @@ shiny::shinyServer(
     values <- shiny::reactiveValues(
       id = NULL, start_time = NULL, survey = NULL, timestamp = NULL,
       date = NULL, prev = NULL, data = NULL, global = NULL)
-
+    
     ## Here's the logic moving through the sections
     shiny::observeEvent(
       input$survey, {
         init_data(values)
         output$typoapp <- shiny::renderUI(survey_panel())
       })
-
+    
     shiny::observeEvent(
       input$challenge, {
         values$survey <- list(
@@ -257,7 +260,7 @@ shiny::shinyServer(
         output$typoapp <- shiny::renderUI(challenge_panel())
         values$date <- new_date()
       })
-
+    
     shiny::observeEvent(
       input$challenge_submit, {
         isolate({
@@ -267,7 +270,7 @@ shiny::shinyServer(
           values$date <- new_date()
         })
       })
-
+    
     shiny::observe({
       if (!is.null(values$date)) {
         date <- values$date
@@ -277,27 +280,27 @@ shiny::shinyServer(
         values$timestamp <- Sys.time()
       }
     })
-
+    
     shiny::observe({
       if (!is.null(values$prev)) {
         output$date_prev <- shiny::renderUI(
           render_prev(values$prev, values$data, values$global))
       }
     })
-
+    
     shiny::observeEvent(
       input$end, {
         save_data(values, TRUE, PATH_OUTPUT)
         output$typoapp <- shiny::renderUI(end_panel())
       })
-
+    
     shiny::observeEvent(
       input$restart, {
         output$typoapp <- shiny::renderUI(start_panel())
       })
-
+    
     output$typoapp <- shiny::renderUI(start_panel())
-
+    
     session$onSessionEnded(function() {
       isolate({
         message(sprintf("Detected session closed for '%s'", values$id))
