@@ -37,7 +37,7 @@ plot_calendar_page <- function(date = as.Date("01/01/2017",
                                width = 500, 
                                height = 400) {
   
-  if (inherits(date, "Date")) {
+  if (!inherits(date, "Date")) {
     stop("date should be in date format.") # date has to be a date
   }
   
@@ -94,12 +94,14 @@ plot_calendar_page <- function(date = as.Date("01/01/2017",
                                   i + (j - 1) * 7)
       
       if (current_day$mon == date_lt$mon) {
-        dcol <- "black" else dcol <- "grey"
-        text(labels = current_day$mday,
-             x = (i - 0.5) * width / 7,
-             y = height - (j - 0.5) * height / nrow, 
-             col = dcol)
+        dcol <- "black" 
+      } else {
+        dcol <- "grey"
       }
+      text(labels = current_day$mday,
+           x = (i - 0.5) * width / 7,
+           y = height - (j - 0.5) * height / nrow, 
+           col = dcol)
       
       if (current_day == date_lt) {
         points(x = (i - 0.5) * width / 7,
@@ -187,7 +189,7 @@ full_text_date <- function(date = as.Date("01/01/2017",
 plot_handwritten_date <- function(date = as.Date("01/01/2017", 
                                                  format = "%d/%m/%Y"), 
                                   d = load_mnist(download_if_missing = TRUE)) {
-  if (inherits(date, "Date")) {
+  if (!inherits(date, "Date")) {
     stop("date should be in date format.") # date has to be a date
   }
   
