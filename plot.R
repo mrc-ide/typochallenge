@@ -256,12 +256,16 @@ new_date <- function(start_date = as.Date("01/01/1900", "%d/%m/%Y"),
   # choose the way the date will be displayed
   date_format <- sample.int(4, size = 1)
   
-  
   all_date_formats <- c("Handwritten", "Calendar", 
                   "TextDayMonthYear", "TextMonthDayYear")
   
+  widths <- c(200, 500, 500, 500)
+  heights <- c(40, 400, 200, 200)
+  
   out <- list(date = date_to_type, 
-              date_format = all_date_formats[date_format])
+              date_format = all_date_formats[date_format], 
+              width = widths[date_format], 
+              height = heights[date_format])
   
   return(out)
   
@@ -270,23 +274,15 @@ new_date <- function(start_date = as.Date("01/01/1900", "%d/%m/%Y"),
 plot_date <- function(date) {
   
   if (date$date_format == "Handwritten") {
-    imageDate <- renderPlot({
-      plot_handwritten_date(date$date)
-    }, width = 200, height = 40 )
+    plot_handwritten_date(date$date)
   } else if(date$date_format == "Calendar") {
-    imageDate <- renderPlot({
-      plot_calendar_page(date$date)
-    }, width = 500, height = 400 ) 
+    plot_calendar_page(date$date)
   } else if(date$date_format == "TextDayMonthYear") {
-    imageDate <- renderPlot({
-      full_text_date(date$date, format = "dmy")
-    }, width = 500, height = 200 ) 
+    full_text_date(date$date, format = "dmy")
   } else if(date$date_format == "TextMonthDayYear") {
-    imageDate <- renderPlot({
-      full_text_date(date$date, format = "mdy")
-    }, width = 500, height = 200 ) 
+    full_text_date(date$date, format = "mdy")
   }
-  
-  imageDate
-  
+
 }
+
+
