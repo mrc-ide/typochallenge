@@ -1,0 +1,24 @@
+---
+title: "Text for TypoChallenge app"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+('You have not yet started the challenge')
+
+#INSTRUCTIONS
+You are going to be presented with dates, in various formats.
+You need to enter these dates in the format 'dd/mm/yyyy'. 
+For instance, if the date is '25th of April 2017, you need to type in '25/04/2017'. 
+Note that '25/4/2017' will also be accepted as a correct entry.
+To validate an entry, type the 'Enter' button.
+You will then be prompted with a new date to enter.
+You can stop at any point, by clicking on 'End the challenge'.
+To start the challenge, click on 'Start the challenge'.
+Good luck!
+
