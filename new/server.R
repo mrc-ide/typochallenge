@@ -16,6 +16,16 @@ start_panel <- function() {
 survey_panel <- function() {
   shiny::sidebarLayout(
     shiny::sidebarPanel(
+      
+      shiny::radioButtons(
+        "gender",
+        "Please select your gender",
+        c("Male",
+          "Female",
+          "Other",
+          "Prefer not to say"),
+        selected = NA),
+      
       shiny::radioButtons(
         "survey_keyboard_layout",
         "Please select your keyboard layout",
