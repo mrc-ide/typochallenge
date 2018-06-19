@@ -134,8 +134,6 @@ shiny::shinyServer(
     shiny::observeEvent(
       input$survey, {
         init_data(values)
-        message(sprintf("Starting survey for %s / %s",
-                        values$id, values$start_time))
         output$typoapp <- shiny::renderUI(survey_panel())
       })
 
@@ -150,7 +148,6 @@ shiny::shinyServer(
 
     shiny::observeEvent(
       input$challenge_submit, {
-        message("submitting!")
         isolate({
           values$prev <- validate_date(input$challenge_date, values$date,
                                        values$timestamp)
