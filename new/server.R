@@ -5,7 +5,10 @@ PATH_OUTPUT <- "contributions"
 
 start_panel <- function() {
   shiny::tagList(
-    shiny::includeMarkdown("doc_start.md"),
+    shiny::p("You have not yet started the challenge"),
+    shiny::includeHTML("instructions.html"),
+    shiny::p("To start the challenge, click on 'Start the challenge'"),
+    shiny::p(shiny::tags$b("Good luck!")),
     shiny::actionButton("survey", "Start the challenge", class = "btn-primary"))
 }
 
@@ -43,6 +46,8 @@ challenge_panel <- function() {
       ## shiny::fluidRow("Press enter to submit", style = "margin-left: 0px;"),
       shiny::actionButton("challenge_submit", "Submit this answer",
                           class = "btn-primary"),
+      shiny::hr(),
+      shiny::includeHTML("instructions.html"),
       shiny::hr(),
       shiny::actionButton("end", "End the challenge", class = "btn-danger")),
     shiny::mainPanel(
