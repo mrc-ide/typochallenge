@@ -17,6 +17,8 @@ survey_panel <- function() {
   shiny::sidebarLayout(
     shiny::sidebarPanel(
       
+      shiny::h4("A few questions before starting..."),
+      
       shiny::radioButtons(
         "gender",
         "Please select your gender",
@@ -26,7 +28,7 @@ survey_panel <- function() {
           "Prefer not to say"),
         selected = NA),
       
-      shiny::selectInput("year_birth", "Year of birth:", 
+      shiny::selectInput("year_birth", "Please select your year of birth:", 
                          choices = 2018:1900),
       
       shiny::radioButtons(
