@@ -153,15 +153,19 @@ full_text_date <- function(date = as.Date("01/01/2017",
         suf <- "th"
   
   if (format == "dmy"){
-    written_date <- paste(day_names[date_lt$wday + 1], 
-                          date_lt$mday, suf, 
-                          month.name[date_lt$mon + 1],
-                          date_lt$year + 1900)
+    written_date <- sprintf("%s %s%s %s %s",
+                            day_names[date_lt$wday + 1],
+                            date_lt$mday, 
+                            suf, 
+                            month.name[date_lt$mon + 1],
+                            date_lt$year + 1900)
   }else if (format == "mdy"){
-    written_date <- paste(day_names[date_lt$wday + 1],
-                          month.name[date_lt$mon + 1],
-                          date_lt$mday,suf,
-                          date_lt$year + 1900)
+    written_date <- sprintf("%s %sc %s%s %s",
+                            day_names[date_lt$wday + 1],
+                            month.name[date_lt$mon + 1],
+                            date_lt$mday,
+                            suf,
+                            date_lt$year + 1900)
   }
   
   # do the plotting
@@ -230,5 +234,59 @@ plot_handwritten_date <- function(date = as.Date("01/01/2017",
   for (idx in date_idx) {
     plot(chosen_image_unique[[match(idx, date_idx_unique)]], box = FALSE)
   }
+  
+}
+
+
+new_date <- function(start_date = as.Date("01/01/1900", "%d/%m/%Y"), 
+                     end_date = as.Date("01/01/2050", "%d/%m/%Y")) {
+  
+  if (!inherits(start_date, "Date")) {
+    stop("start_date should be in date format.") # start_date has to be a date
+  }
+  
+  if (!inherits(end_date, "Date")) {
+    stop("end_date should be in date format.") # end_date has to be a date
+  }
+  
+  # new date to type randomly chosen
+  date_to_type <- start_date +
+    sample.int(as.numeric(end_date - start_date), size = 1)
+  
+  # choose the way the date will be displayed
+  date_format <- sample.int(4, size = 1)
+  
+  
+  all_date_formats <- c("Handwritten", "Calendar", 
+                  "TextDayMonthYear", "TextMonthDayYear")
+  
+  out <- list(date = date_to_type, 
+              date_format = all_date_formats[date_format])
+  
+  return(out)
+  
+}
+
+plot_date <- function(date) {
+  
+  if (date$date_format == "Handwritten") {
+    imageDate <- renderPlot({
+      plot_handwritten_date(date$date)
+    }, width = 200, height = 40 )
+  } else if(date$date_format == "Calendar") {
+    imageDate <- renderPlot({
+      plot_calendar_page(date$date)
+    }, width = 500, height = 400 ) 
+  } else if(date$date_format == "TextDayMonthYear") {
+    imageDate <- renderPlot({
+      full_text_date(date$date, format = "dmy")
+    }, width = 500, height = 200 ) 
+  } else if(date$date_format == "TextMonthDayYear") {
+    imageDate <- renderPlot({
+      full_text_date(date$date, format = "mdy")
+    }, width = 500, height = 200 ) 
+  }
+  
+  imageDate
   
 }
