@@ -31,6 +31,12 @@ survey_panel <- function() {
       shiny::selectInput("year_birth", "Please select your year of birth:", 
                          choices = 2018:1900),
       
+      shiny::selectInput("country_from", "Where are you from?", 
+                         choices = rworldmap::countryExData[ , 2]),
+      
+      shiny::selectInput("country_residence", "Where do you currently live?", 
+                         choices = rworldmap::countryExData[ , 2]),
+      
       shiny::radioButtons(
         "survey_keyboard_layout",
         "Please select your keyboard layout",
@@ -38,7 +44,7 @@ survey_panel <- function() {
           "QUERTY (bottom image)",
           "Other"),
         selected = NA),
-
+      
       shiny::radioButtons(
         "survey_keyboard_input",
         "Do you use the numeric keypad or the row of numbers to enter numbers",
@@ -171,10 +177,12 @@ shiny::shinyServer(
     shiny::observeEvent(
       input$challenge, {
         values$survey <- list(
-          keyboard_layout = input$survey_keyboard_layout,
-          keyboard_input = input$survey_keyboard_input, 
           gender = input$gender, 
-          year_birth = input$year_birth)
+          year_birth = input$year_birth,
+          country_from = input$country_from,
+          country_residence = input$country_residence,
+          keyboard_layout = input$survey_keyboard_layout,
+          keyboard_input = input$survey_keyboard_input)
         output$typoapp <- shiny::renderUI(challenge_panel())
         values$date <- new_date()
       })
