@@ -1,0 +1,17 @@
+Instructions
+
+You are going to be presented with dates, in various formats.
+You need to enter these dates in the format 'dd/mm/yyyy'.
+
+For instance, if the date is '25th of April 2017, you need to type in '25/04/2017'.
+Note that '25/4/2017' will also be accepted as a correct entry.
+
+Please use '/' as a separator when typing in the date, even if the date was shown with a dot or another separator.
+
+To validate an entry, press the 'Enter' key or click on the 'Submit' button. 
+You will then be prompted with a new date to enter. 
+
+You can stop at any point, by clicking on 'End the challenge'.
+
+To start the challenge, click on 'Start the challenge'
+Good luck!
