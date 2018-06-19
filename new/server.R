@@ -172,7 +172,7 @@ shiny::shinyServer(
 
     shiny::observeEvent(
       input$end, {
-        save_data(values, PATH_OUTPUT)
+        save_data(values, TRUE, PATH_OUTPUT)
         output$typoapp <- shiny::renderUI(end_panel())
       })
 
@@ -184,7 +184,7 @@ shiny::shinyServer(
     session$onSessionEnded(function() {
       isolate({
         message(sprintf("Detected session closed for '%s'", values$id))
-        save_data(values, PATH_OUTPUT)
+        save_data(values, FALSE, PATH_OUTPUT)
         output$typoapp <- shiny::renderUI(end_panel())
       })
     })
@@ -206,13 +206,14 @@ data_to_table <- function(data) {
 }
 
 
-save_data <- function(values, path) {
+save_data <- function(values, clean_exit, path) {
   if (!is.null(values$data)) {
     message(sprintf("Saving data for '%s'", values$id))
     dir.create(path, FALSE, TRUE)
     ret <- list(id = values$id,
                 start_time = values$start_time,
                 app_version = APP_VERSION,
+                clean_exit = clean_exit,
                 survey = values$survey,
                 data = data_to_table(values$data))
     dest <- file.path(path, sprintf("%s.rds", ret$id))
