@@ -180,6 +180,14 @@ shiny::shinyServer(
       ##start_panel())
       ## challenge_panel())
       survey_panel())
+
+    session$onSessionEnded(function() {
+      isolate({
+        message(sprintf("Detected session closed for '%s'", values$id))
+        save_data(values, PATH_OUTPUT)
+        output$typoapp <- shiny::renderUI(end_panel())
+      })
+    })
   }
 )
 
