@@ -26,6 +26,9 @@ survey_panel <- function() {
           "Prefer not to say"),
         selected = NA),
       
+      shiny::selectInput("year_birth", "Year of birth:", 
+                         choices = 2018:1900),
+      
       shiny::radioButtons(
         "survey_keyboard_layout",
         "Please select your keyboard layout",
