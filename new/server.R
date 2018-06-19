@@ -1,3 +1,5 @@
+source("plot.R")
+
 start_panel <- function() {
   shiny::tagList(
     shiny::includeMarkdown("doc_start.md"),
@@ -52,21 +54,15 @@ end_panel <- function() {
 }
 
 
-next_date <- function() {
-  list(value = runif(20))
+validate_date <- function(user_date, real_date) {
+  real_date$user <- user_date
+  real_date$correct <- check_date(user_date, real_date$date)
+  real_date
 }
 
 
-validate_date <- function(given, data) {
-  correct <- runif(1) < 0.5
-  list(correct = correct,
-       real = data$value,
-       given = given)
-}
-
-
-render_date <- function(date) {
-  shiny::renderPlot(plot(date$value))
+check_date <- function(typed_date, date) {
+  isTRUE(as.Date(typed_date, format = "%d/%m/%Y") == date)
 }
 
 
@@ -74,14 +70,15 @@ render_prev <- function(prev, stats) {
   if (!is.null(prev)) {
     ## common <- sprintf("You have entered %s / %s correctly",
     ##                   stats$correct, stats$total)
+    date_real <- format(prev$date, "%d/%m/%Y")
     if (prev$correct) {
       title <- "Last entry was correct"
-      body <- "Message on success"
+      body <- sprintf("You entered '%s' correctly", date_real)
       type <- "success"
     } else {
       title <- "Typo in previous entry"
-      ## body <- sprintf("You entered '%s' but the date was '%s'", prev$
-      body <- "Message on failure"
+      body <- sprintf("You entered '%s' but the real date was '%s'",
+                      prev$user, date_real)
       type <- "danger"
     }
     shiny::div(
@@ -114,7 +111,7 @@ shiny::shinyServer(
         values$survey <- list(input$survey_keyboard_layout,
                               input$survey_keyboard_input)
         output$typoapp <- shiny::renderUI(challenge_panel())
-        values$date <- next_date()
+        values$date <- new_date()
       })
 
     shiny::observeEvent(
@@ -122,13 +119,15 @@ shiny::shinyServer(
         message("submitting!")
         isolate({
           values$prev <- validate_date(input$challenge_date, values$date)
-          values$date <- next_date()
+          values$date <- new_date()
         })
       })
 
     shiny::observe({
       if (!is.null(values$date)) {
-        output$date_image <- render_date(values$date)
+        date <- values$date
+        output$date_image <- shiny::renderPlot(
+          plot_date(date), width = date$width, height = date$height)
       }
     })
 
