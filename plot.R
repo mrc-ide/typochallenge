@@ -9,8 +9,7 @@
 #' @export
 #' @examples
 #' weekday_names()
-weekday_names <- function()
-{
+weekday_names <- function() {
   # Names of the week days
   day_names <- paste0(c("Sun", "Mon", "Tues",
                         "Wednes", "Thurs", "Fri",
@@ -36,10 +35,9 @@ weekday_names <- function()
 plot_calendar_page <- function(date = as.Date("01/01/2017", 
                                               format = "%d/%m/%Y"), 
                                width = 500, 
-                               height = 400) 
-{
+                               height = 400) {
   
-  if (class(date) != "Date"){
+  if (inherits(date, "Date")) {
     stop("date should be in date format.") # date has to be a date
   }
   
@@ -79,32 +77,35 @@ plot_calendar_page <- function(date = as.Date("01/01/2017",
   # test if the calendar needs five or six rows
   last_day_of_previous_month <- date - as.POSIXlt(date)$mday
   remaining_from_previous_month <- first_dmonth
-  if(as.POSIXlt(last_day_of_previous_month - 
-                remaining_from_previous_month + 5 * 7 + 1)$mon == date_lt$mon){
+  if (as.POSIXlt(last_day_of_previous_month - 
+                 remaining_from_previous_month + 5 * 7 + 1)$mon == 
+      date_lt$mon) {
     nrow <- 6 # if still in same month after 5 rows ( = weeks) need a 6th row
-  } else{
+  } else {
     nrow <- 5
   } 
   
   # may be nice to do this not in a loop but dates and matrices not friends
   # Plot the days in the calendar
-  for (i in 1:7){
-    for (j in 1:nrow){
+  for (i in 1:7) {
+    for (j in 1:nrow) {
       #Calculate the day corresponding to the position in the calendar
       current_day <- as.POSIXlt(date - as.POSIXlt(date)$mday - first_dmonth +
                                   i + (j - 1) * 7)
       
-      if(current_day$mon == date_lt$mon)
+      if (current_day$mon == date_lt$mon) {
         dcol <- "black" else dcol <- "grey"
         text(labels = current_day$mday,
              x = (i - 0.5) * width / 7,
              y = height - (j - 0.5) * height / nrow, 
              col = dcol)
-        
-        if(current_day == date_lt)
-          points(x = (i - 0.5) * width / 7,
-                 y = height - (j - 0.5) * height / nrow,
-                 col = "red", pch = 1, cex = 5.5, lwd = 4)
+      }
+      
+      if (current_day == date_lt) {
+        points(x = (i - 0.5) * width / 7,
+               y = height - (j - 0.5) * height / nrow,
+               col = "red", pch = 1, cex = 5.5, lwd = 4)
+      }
     }
   }
   
@@ -130,11 +131,11 @@ plot_calendar_page <- function(date = as.Date("01/01/2017",
 #' @return NULL
 #' @export
 #' @examples
-#' plot_calendar_page(Sys.Date()) # show a page with today's date circled in red
+#' full_text_date(as.Date("01/01/1900", "%d/%m/%Y") + 
+#'   sample.int(55000, size = 1))
 full_text_date <- function(date = as.Date("01/01/2017", 
                                           format = "%d/%m/%Y"), 
-                           format = c("dmy", "mdy"))
-{
+                           format = c("dmy", "mdy")) {
   format <- match.arg(format)
   
   # Names of the week days
@@ -143,27 +144,32 @@ full_text_date <- function(date = as.Date("01/01/2017",
   # convert the date in the POSIXlt classes
   date_lt <- as.POSIXlt(date)
   
-  # derive the suffixe the numeral
-  if(date_lt$mday %in% c(1,21,31)) suf <- "st" else
-    if(date_lt$mday %in% c(2,22)) suf <- "nd" else
-      if(date_lt$mday %in% c(3,23)) suf <- "rd" else
+  # derive the suffix for the numeral
+  if (date_lt$mday %in% c(1, 21, 31)) suf <- "st" else
+    if (date_lt$mday %in% c(2, 22)) suf <- "nd" else
+      if (date_lt$mday %in% c(3, 23)) suf <- "rd" else
         suf <- "th"
   
-  if(format=="dmy")
-  {
-    written_date <- paste0(day_names[date_lt$wday+1]," ",date_lt$mday,suf," ",month.name[date_lt$mon + 1]," ",date_lt$year+1900)
-  }else if(format=="mdy")
-  {
-    written_date <- paste0(day_names[date_lt$wday+1]," ",month.name[date_lt$mon + 1]," ",date_lt$mday,suf," ",date_lt$year+1900)
+  if (format == "dmy"){
+    written_date <- paste(day_names[date_lt$wday + 1], 
+                          date_lt$mday, suf, 
+                          month.name[date_lt$mon + 1],
+                          date_lt$year + 1900)
+  }else if (format == "mdy"){
+    written_date <- paste(day_names[date_lt$wday + 1],
+                          month.name[date_lt$mon + 1],
+                          date_lt$mday,suf,
+                          date_lt$year + 1900)
   }
   
+  # do the plotting
   par(mar=c(0, 0, 0, 0))
-  plot(NULL,xlim=c(0,300),ylim=c(0,50), axes = F, xlab="",ylab="", main="")
+  plot(NULL, xlim = c(0, 300), ylim = c(0, 50), 
+       axes = FALSE, 
+       xlab = "", ylab = "", main = "")
   # rect(xleft = 0, xright = 300, ybottom = 0, ytop = 50)
-  legend("topleft",written_date,bty="n", cex=2)
+  legend("topleft", written_date, bty = "n", cex = 2)
 }
-
-# full_text_date(as.Date("01/01/1900", "%d/%m/%Y")+sample.int(55000, size=1))
 
 #######################################
 ### functions to generate a plot of a handwritten date ###
@@ -178,39 +184,49 @@ full_text_date <- function(date = as.Date("01/01/2017",
 #' @export
 #' @examples
 #' plot_handwritten_date(Sys.Date()) # print today's date
-plot_handwritten_date <- function(date=as.Date("01/01/2017", format="%d/%m/%Y"), d=load_mnist(download_if_missing = TRUE)) # date has to be a date
-{
+plot_handwritten_date <- function(date = as.Date("01/01/2017", 
+                                                 format = "%d/%m/%Y"), 
+                                  d = load_mnist(download_if_missing = TRUE)) {
+  if (inherits(date, "Date")) {
+    stop("date should be in date format.") # date has to be a date
+  }
+  
   # convert date to string with "/" separator
   date <- as.character(date, format="%d/%m/%Y")
   
   # create a "dot" image to separate day, month and year
   width <- 3
   dot_mat <- matrix(0, 28, 28)
-  for(i in 20+(1:width))
-  {
+  for (i in 20 + (1:width)) {
     dot_mat[i,(28-width)/2+(1:width)] <- 1
   }
   
   separator <- t(dot_mat)
   class(separator) <- c("mnist_digit", "matrix")
-  attr(separator, "label") <- 0 ### this S3 class forces to have an integer label...
+  attr(separator, "label") <- 0 # this S3 class forces to have an integer label
   attr(separator, "label") <- "mnist_digit"
   attr(separator, "data") <- "matrix"
   
   # create a panel of 10 images for dd/mm/yyyy
   par(mfrow=c(1, 10), mar=c(0, 0, 0, 0))
   
-  # generate a random sample of handwritten images for each character in the date string, forcing repeated numbers to have the same handwriting every time they appear 
+  # generate a random sample of handwritten images for each character 
+  # in the date string, forcing repeated numbers to have the same handwriting 
+  # every time they appear 
   date_idx <- strsplit(date, NULL)[[1]]
   date_idx_unique <- unique(date_idx)
   chosen_image_unique <- lapply(date_idx_unique, function(k) {
-    if (k == "/") chosen_image <- separator else chosen_image <- d[[sample(which(d$label %in% as.numeric(k)), 1)]]; return(chosen_image)
+    if (k == "/") {
+      chosen_image <- separator 
+    }else {
+      chosen_image <- d[[sample(which(d$label %in% as.numeric(k)), 1)]]
+    }
+    return(chosen_image)
   })
   
   # do the plotting
-  for(idx in date_idx)
-  {
-    plot(chosen_image_unique[[match(idx, date_idx_unique)]], box=FALSE)
+  for (idx in date_idx) {
+    plot(chosen_image_unique[[match(idx, date_idx_unique)]], box = FALSE)
   }
   
 }
