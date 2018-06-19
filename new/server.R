@@ -48,7 +48,7 @@ challenge_panel <- function() {
 
 end_panel <- function() {
   shiny::tagList(
-    shiny::p("this is the end"))
+    shiny::includeMarkdown("doc_end.md"))
 }
 
 
