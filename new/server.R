@@ -32,9 +32,16 @@ survey_panel <- function() {
 
 
 challenge_panel <- function() {
-  shiny::tagList(
-    shiny::p("this is the challenge"),
-    shiny::actionButton("end", "Finish", class = "btn-primary"))
+  shiny::sidebarLayout(
+    shiny::sidebarPanel(
+      shiny::textInput("challenge_date", "Type the date", ""),
+      ## shiny::fluidRow("Press enter to submit", style = "margin-left: 0px;"),
+      shiny::actionButton("submit", "Submit this answer",
+                          class = "btn-primary"),
+      shiny::hr(),
+      shiny::actionButton("end", "End the challenge", class = "btn-danger")),
+    shiny::mainPanel(
+      shiny::plotOutput("date_image")))
 }
 
 
@@ -44,13 +51,24 @@ end_panel <- function() {
 }
 
 
+next_date <- function() {
+  runif(20)
+}
+
+
+render_date <- function(date) {
+  shiny::renderPlot(plot(date))
+}
+
+
 shiny::shinyServer(
   function(input, output, session) {
     values <- shiny::reactiveValues(
       id = uuid::UUIDgenerate(),
       start_time = Sys.time(),
       survey = NULL,
-      data = NULL)
+      data = NULL,
+      date = NULL)
 
     ## Here's the logic moving through the sections
     shiny::observeEvent(
@@ -65,13 +83,28 @@ shiny::shinyServer(
         values$survey <- list(input$survey_keyboard_layout,
                               input$survey_keyboard_input)
         output$typoapp <- shiny::renderUI(challenge_panel())
+        values$date <- next_date()
       })
+
+    shiny::observeEvent(
+      input$submit, {
+        message("submitting!")
+        values$date <- next_date()
+      })
+
+    shiny::observe({
+      if (!is.null(values$date)) {
+        output$date_image <- render_date(values$date)
+      }
+    })
 
     shiny::observeEvent(
       input$end,
       output$typoapp <- shiny::renderUI(end_panel()))
 
     output$typoapp <- shiny::renderUI(
-      start_panel())
+      ## start_panel())
+      ## challenge_panel())
+      survey_panel())
   }
 )
