@@ -213,9 +213,11 @@ saveData <- function(data) { # function to save the contribution
 #' @return True or False
 #' @export
 #' @examples
-checkDateIsCorrect <- function(typedDate="1/1/2017", date=as.Date("01/01/2017", format="%d/%m/%Y"))
+checkDateIsCorrect <- function(typedDate = "1/1/2017", 
+                               date = as.Date("01/01/2017", 
+                                              format = "%d/%m/%Y"))
 {
-  result<-(as.Date(typedDate, format="%d/%m/%Y")==date)
+  result<-(as.Date(typedDate, format = "%d/%m/%Y") == date)
   if(is.na(result))
     return(FALSE) else
       return(result)
