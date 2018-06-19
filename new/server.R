@@ -159,7 +159,9 @@ shiny::shinyServer(
       input$challenge, {
         values$survey <- list(
           keyboard_layout = input$survey_keyboard_layout,
-          keyboard_input = input$survey_keyboard_input)
+          keyboard_input = input$survey_keyboard_input, 
+          gender = input$gender, 
+          year_birth = input$year_birth)
         output$typoapp <- shiny::renderUI(challenge_panel())
         values$date <- new_date()
       })
