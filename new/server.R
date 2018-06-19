@@ -8,28 +8,28 @@ start_panel <- function() {
 
 
 survey_panel <- function() {
-  shiny::tagList(
-    shiny::p("We are going to ask some questions about your computer"),
+  shiny::sidebarLayout(
+    shiny::sidebarPanel(
+      shiny::radioButtons(
+        "survey_keyboard_layout",
+        "Please select your keyboard layout",
+        c("AZERTY (bottom image)",
+          "QUERTY (top image)",
+          "Other"),
+        selected = NA),
 
-    shiny::img(src = "layouts.png"),
+      shiny::radioButtons(
+        "survey_keyboard_input",
+        "Do you use the numeric keypad or the row of numbers to enter numbers",
+        c("Numeric keypad (purple buttons in image, on right)",
+          "Top row (blue bottons in image, on top)",
+          "A bit of both, I am uncontrollable"),
+        selected = NA),
 
-    shiny::radioButtons(
-      "survey_keyboard_layout",
-      "Please select your keyboard layout",
-      c("AZERTY (bottom image)",
-        "QUERTY (top image)",
-        "Other"),
-      selected = NA),
-
-    shiny::radioButtons(
-      "survey_keyboard_input",
-      "Do you use the numeric keypad or the row of numbers to enter numbers",
-      c("Numeric keypad (purple buttons in image, on right)",
-        "Top row (blue bottons in image, on top)",
-        "A bit of both, I am uncontrollable"),
-      selected = NA),
-
-    shiny::actionButton("challenge", "To the typos!", class = "btn-primary"))
+      shiny::hr(),
+      shiny::actionButton("challenge", "To the typos!", class = "btn-primary")),
+    shiny::mainPanel(
+      shiny::img(src = "layouts.png")))
 }
 
 
@@ -142,8 +142,8 @@ shiny::shinyServer(
       output$typoapp <- shiny::renderUI(end_panel()))
 
     output$typoapp <- shiny::renderUI(
-      ## start_panel())
+      start_panel())
       ## challenge_panel())
-      survey_panel())
+      ##survey_panel())
   }
 )
