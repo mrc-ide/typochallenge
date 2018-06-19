@@ -287,7 +287,7 @@ plot_date <- function(date) {
 
 check_date <- function(user_date, real_date) {
   real_date$user <- user_date
-  real_date$correct <- check_date(user_date, real_date$date)
+  real_date$correct <- validate_date(user_date, real_date$date)
   
   real_date
 }
@@ -297,7 +297,7 @@ check_date <- function(user_date, real_date) {
 ### function to validate a typed date     ###
 #############################################
 
-check_date <- function(typed_date, date) {
+validate_date <- function(typed_date, date) {
   isTRUE(as.Date(typed_date, format = "%d/%m/%Y") == date)
 }
 
