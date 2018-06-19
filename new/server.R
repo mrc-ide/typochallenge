@@ -92,25 +92,36 @@ check_date <- function(typed_date, date) {
 }
 
 
-render_prev <- function(prev, stats) {
+render_prev <- function(prev, data) {
   if (!is.null(prev)) {
     ## common <- sprintf("You have entered %s / %s correctly",
     ##                   stats$correct, stats$total)
     date_real <- format(prev$date, "%d/%m/%Y")
     if (prev$correct) {
       title <- "Last entry was correct"
-      body <- sprintf("You entered '%s' correctly", date_real)
+      body_feedback <- sprintf("You entered '%s' correctly", date_real)
       type <- "success"
     } else {
       title <- "Typo in previous entry"
-      body <- sprintf("You entered '%s' but the real date was '%s'",
+      body_feedback <- sprintf("You entered '%s' but the real date was '%s'",
                       prev$user, date_real)
       type <- "danger"
     }
+    body_stats <- sprintf("This answer: %ss, best time, %ss, average %ss",
+                          round(prev$elapsed, 2),
+                          round(data$time_best, 2),
+                          round(data$time_total / length(data$rows), 2))
+
     shiny::div(
-      class = sprintf("panel panel-%s", type),
-      shiny::div(class = "panel-heading",title),
-      shiny::div(class = "panel-body", body))
+      class = "panel-group",
+      shiny::div(
+        class = sprintf("panel panel-%s", type),
+        shiny::div(class = "panel-heading", title),
+        shiny::div(class = "panel-body", body_feedback)),
+      shiny::div(
+        class = "panel panel-info",
+        shiny::div(class = "panel-heading", "Your statistics"),
+        shiny::div(class = "panel-body", body_stats)))
   }
 }
 
@@ -121,7 +132,7 @@ update_data <- function(prev, data) {
     time_best <- prev$elapsed
     time_total <- time_best
   } else {
-    time_best <- min(prev$elapsed, data$best)
+    time_best <- min(prev$elapsed, data$time_best)
     time_total <- prev$elapsed + data$time_total
   }
   prev$date <- format(prev$date, "%d/%m/%Y")
@@ -188,7 +199,8 @@ shiny::shinyServer(
 
     shiny::observe({
       if (!is.null(values$prev)) {
-        output$date_prev <- shiny::renderUI(render_prev(values$prev))
+        output$date_prev <- shiny::renderUI(
+          render_prev(values$prev, values$data))
       }
     })
 
