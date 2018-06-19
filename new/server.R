@@ -56,7 +56,8 @@ challenge_panel <- function() {
 
 end_panel <- function() {
   shiny::tagList(
-    shiny::includeMarkdown("doc_end.md"))
+    shiny::includeMarkdown("doc_end.md"),
+    shiny::actionButton("restart", "Restart challenge?", class = "btn-primary"))
 }
 
 
@@ -112,26 +113,27 @@ update_data <- function(prev, data) {
        time_total = time_total)
 }
 
+init_data <- function(values) {
+  values$id <- uuid::UUIDgenerate()
+  values$start_time <- Sys.time()
+  values$survey <- NULL
+  values$timestamp <- NULL
+  values$date <- NULL
+  values$prev <- NULL
+  values$data <- list()
+  message(sprintf("Starting session: '%s'", values$id))
+}
+
 shiny::shinyServer(
   function(input, output, session) {
     values <- shiny::reactiveValues(
-      ## Session identifier
-      id = uuid::UUIDgenerate(),
-      start_time = Sys.time(),
-      ## Data on the survey
-      survey = NULL,
-      ## Used for tracking how long things take
-      timestamp = NULL,
-      ## Current challenge date
-      date = NULL,
-      ## Last challenge date and validation
-      prev = NULL,
-      ## All survey data so far
-      data = list())
+      id = NULL, start_time = NULL, survey = NULL, timestamp = NULL,
+      date = NULL, prev = NULL, data = NULL)
 
     ## Here's the logic moving through the sections
     shiny::observeEvent(
       input$survey, {
+        init_data(values)
         message(sprintf("Starting survey for %s / %s",
                         values$id, values$start_time))
         output$typoapp <- shiny::renderUI(survey_panel())
@@ -179,10 +181,12 @@ shiny::shinyServer(
         output$typoapp <- shiny::renderUI(end_panel())
       })
 
-    output$typoapp <- shiny::renderUI(
-      ##start_panel())
-      ## challenge_panel())
-      survey_panel())
+    shiny::observeEvent(
+      input$restart, {
+        output$typoapp <- shiny::renderUI(start_panel())
+      })
+
+    output$typoapp <- shiny::renderUI(start_panel())
 
     session$onSessionEnded(function() {
       isolate({
