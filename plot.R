@@ -1,4 +1,26 @@
 #######################################
+### functions to create a vector with weekdays ###
+### currently starting on Sunday ###
+#######################################
+
+#' create a vector with weekdays 
+#' 
+#' @return a vector of weekdays
+#' @export
+#' @examples
+#' weekday_names()
+weekday_names <- function()
+{
+  # Names of the week days
+  day_names <- paste0(c("Sun", "Mon", "Tues",
+                        "Wednes", "Thurs", "Fri",
+                        "Satur"), 
+                      "day")
+  return(day_names)
+}
+
+
+#######################################
 ### functions to plot a calendar page ###
 #######################################
 
@@ -22,10 +44,7 @@ plot_calendar_page <- function(date = as.Date("01/01/2017",
   }
   
   # Names of the week days
-  day_names <- paste0(c("Sun", "Mon", "Tues",
-                        "Wednes", "Thurs", "Fri",
-                        "Satur"), 
-                      "day")
+  day_names <- weekday_names()
   
   # convert the date in the POSIXlt classes
   date_lt <- as.POSIXlt(date)
@@ -64,7 +83,7 @@ plot_calendar_page <- function(date = as.Date("01/01/2017",
                 remaining_from_previous_month + 5 * 7 + 1)$mon == date_lt$mon){
     nrow <- 6 # if still in same month after 5 rows ( = weeks) need a 6th row
   } else{
-      nrow <- 5
+    nrow <- 5
   } 
   
   # may be nice to do this not in a loop but dates and matrices not friends
@@ -112,20 +131,19 @@ plot_calendar_page <- function(date = as.Date("01/01/2017",
 #' @export
 #' @examples
 #' plot_calendar_page(Sys.Date()) # show a page with today's date circled in red
-full_text_date<-function(date=as.Date("01/01/2017", format="%d/%m/%Y"), format=c("dmy","mdy"))
+full_text_date <- function(date = as.Date("01/01/2017", 
+                                          format = "%d/%m/%Y"), 
+                           format = c("dmy", "mdy"))
 {
   format <- match.arg(format)
   
-  #Names of the calendar months
-  month.name <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+  # Names of the week days
+  day_names <- weekday_names()
   
-  #Names of the week days
-  day_names <- paste0(c("Sun","Mon","Tues","Wednes","Thurs","Fri","Satur"),"day")
-  
-  #convert the date in the POSIXlt classes
+  # convert the date in the POSIXlt classes
   date_lt <- as.POSIXlt(date)
   
-  #derive the suffixe the numeral
+  # derive the suffixe the numeral
   if(date_lt$mday %in% c(1,21,31)) suf <- "st" else
     if(date_lt$mday %in% c(2,22)) suf <- "nd" else
       if(date_lt$mday %in% c(3,23)) suf <- "rd" else
