@@ -3,6 +3,50 @@ source("plot.R")
 APP_VERSION <- "1.0.0"
 PATH_OUTPUT <- "contributions"
 
+cache <- new.env(parent = emptyenv())
+
+read_contributions <- function() {
+  d <- lapply(dir(PATH_OUTPUT, pattern = "\\.rds$"), read_contribution)
+  i <- vapply(d, is.null, logical(1))
+  if (any(i)) {
+    d <- d[!i]
+    s <- do.call("rbind", d)
+    list(total_sum = as.integer(sum(s[, "total"])),
+         total_mean = mean(s[, "total"]),
+         correct_sum = as.integer(sum(s[, "correct"])),
+         correct_mean = mean(s[, "correct"]),
+         best_total = as.integer(max(s[, "total"])),
+         best_correct = as.integer(max(s[, "correct"])),
+         best_best = min(s[, "best"]),
+         best_mean = mean(s[, "best"]),
+         best_mean = min(s[, "mean"]),
+         mean_mean = mean(s[, "mean"]))
+  } else {
+    NULL
+  }
+}
+
+
+read_contribution <- function(p) {
+  if (p %in% names(cache)) {
+    return(cache[[p]])
+  }
+  d <- readRDS(file.path(PATH_OUTPUT, p))
+  i <- d$data$correct
+  if (any(i)) {
+    t <- d$data$elapsed[i]
+    ret <- c(total = length(i),
+      correct = sum(i),
+      best = min(t),
+      mean = mean(t))
+  } else {
+    ret <- NULL
+  }
+  cache[[p]] <- ret
+  ret
+}
+
+
 start_panel <- function() {
   shiny::tagList(
     shiny::p("You have not yet started the challenge"),
@@ -94,7 +138,7 @@ check_date <- function(typed_date, date) {
 }
 
 
-render_prev <- function(prev, data) {
+render_prev <- function(prev, data, global) {
   if (!is.null(prev)) {
     ## common <- sprintf("You have entered %s / %s correctly",
     ##                   stats$correct, stats$total)
@@ -117,14 +161,23 @@ render_prev <- function(prev, data) {
         n_entered, ngettext(n_entered, "try", "tries"))
     } else {
       s1 <- sprintf(
-        "You have recorded %d correct %s (out of %d %s)",
+        "You have recorded %d correct %s (out of %d %s).",
         data$n_correct, ngettext(data$n_correct, "date", "dates"),
         n_entered, ngettext(n_entered, "try", "tries"))
-      s2 <- sprintf("This answer: %ss, best time, %ss, average %ss",
-                    round(prev$elapsed, 2),
-                    round(data$time_best, 2),
-                    round(data$time_total / n_entered, 2))
-      body_stats <- paste(s1, s2)
+      s2 <- sprintf(
+        "This answer: %ss, best time, %ss, average %ss.",
+        round(prev$elapsed, 2),
+        round(data$time_best, 2),
+        round(data$time_total / n_entered, 2))
+      if (is.null(global)) {
+        s3 <- ""
+      } else {
+        s3 <- sprintf(
+          "All time average: %s dates, %s correct, %ss fastest, %ss average.",
+          round(global$total_mean, 2), round(global$correct_mean, 2),
+          round(global$best_mean, 2), round(global$mean_mean, 2))
+      }
+      body_stats <- paste(s1, s2, s3)
     }
 
     shiny::div(
@@ -167,6 +220,7 @@ init_data <- function(values) {
   values$date <- NULL
   values$prev <- NULL
   values$data <- list()
+  values$global <- read_contributions()
   message(sprintf("Starting session: '%s'", values$id))
 }
 
@@ -174,7 +228,7 @@ shiny::shinyServer(
   function(input, output, session) {
     values <- shiny::reactiveValues(
       id = NULL, start_time = NULL, survey = NULL, timestamp = NULL,
-      date = NULL, prev = NULL, data = NULL)
+      date = NULL, prev = NULL, data = NULL, global = NULL)
 
     ## Here's the logic moving through the sections
     shiny::observeEvent(
@@ -217,7 +271,7 @@ shiny::shinyServer(
     shiny::observe({
       if (!is.null(values$prev)) {
         output$date_prev <- shiny::renderUI(
-          render_prev(values$prev, values$data))
+          render_prev(values$prev, values$data, values$global))
       }
     })
 
