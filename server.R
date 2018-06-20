@@ -78,11 +78,11 @@ survey_panel <- function() {
       
       shiny::selectInput("country_from", "Where are you from?", 
                          choices = c("Prefer not to say", 
-                                     rworldmap::countryExData[ , 2])),
+                                     sort(rworldmap::countryExData[ , 2]))),
       
       shiny::selectInput("country_residence", "Where do you currently live?", 
                          choices = c("Prefer not to say", 
-                                     rworldmap::countryExData[ , 2])),
+                                     sort(rworldmap::countryExData[ , 2]))),
       
       shiny::radioButtons(
         "survey_keyboard_layout",
