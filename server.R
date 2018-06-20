@@ -120,7 +120,7 @@ challenge_panel <- function() {
       shiny::actionButton("challenge_submit", "Submit this answer",
                           class = "btn-primary"),
       shiny::hr(),
-      shiny::includeHTML("instructions.html"),
+      shiny::includeHTML("instructions_short.html"),
       shiny::hr(),
       shiny::actionButton("end", "End the challenge", class = "btn-danger")),
     shiny::mainPanel(
