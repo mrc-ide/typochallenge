@@ -3,6 +3,8 @@ source("plot.R")
 APP_VERSION <- "1.0.0"
 PATH_OUTPUT <- "contributions"
 
+list_countries <- sort(rworldmap::countryExData[ , 2])
+
 cache <- new.env(parent = emptyenv())
 
 read_contributions <- function() {
@@ -78,11 +80,11 @@ survey_panel <- function() {
       
       shiny::selectInput("country_from", "Where are you from?", 
                          choices = c("Prefer not to say", 
-                                     sort(rworldmap::countryExData[ , 2]))),
+                                     list_countries)),
       
       shiny::selectInput("country_residence", "Where do you currently live?", 
                          choices = c("Prefer not to say", 
-                                     sort(rworldmap::countryExData[ , 2]))),
+                                     list_countries)),
       
       shiny::radioButtons(
         "survey_keyboard_layout",
