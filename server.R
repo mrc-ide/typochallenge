@@ -66,7 +66,7 @@ survey_panel <- function() {
       
       shiny::h4("A few questions before starting..."),
       
-      shiny::h6("We ask these questions so that..."), 
+      shiny::h6("We ask these questions so that we can better understand why typos are made."), 
       
       shiny::textInput("today", "What is today's date?", value = "", 
                        width = NULL, placeholder = NULL),
