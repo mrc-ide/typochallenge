@@ -53,7 +53,8 @@ start_panel <- function() {
     shiny::includeHTML("instructions.html"),
     shiny::p("To start the challenge, click on 'Start the challenge'"),
     shiny::p(shiny::tags$b("Good luck!")),
-    shiny::actionButton("survey", "Start the challenge", class = "btn-primary"))
+    shiny::actionButton("survey", "Start the challenge", class = "btn-primary"),
+    shiny::includeHTML("doc_sharing.html"))
 }
 
 
@@ -128,13 +129,9 @@ challenge_panel <- function() {
 
 end_panel <- function() {
   shiny::tagList(
-    h5("Invite your friends to participate!", 
-       a("", 
-         href = 'https://twitter.com/share',
-         img(src='./twitter.png',  
-             width = "100px", height = "30px"))),
     shiny::includeMarkdown("doc_end.md"),
-    shiny::actionButton("restart", "Restart challenge?", class = "btn-primary"))
+    shiny::actionButton("restart", "Restart challenge?", class = "btn-primary"),
+    shiny::includeHTML("doc_sharing.html"))
 }
 
 

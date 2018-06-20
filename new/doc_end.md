@@ -1,7 +1,3 @@
-Thank you for taking the survey.
-
-Information on sharing
-
-Take it again?
+Thank you for taking the survey!
 
 Information about the study perhaps
