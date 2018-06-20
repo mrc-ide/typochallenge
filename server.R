@@ -97,7 +97,7 @@ survey_panel <- function() {
         "Do you use the numeric keypad or the row of numbers to enter numbers",
         c("Top row (blue keys in image, on top)",
           "Numeric keypad (purple keys in image, on right)",
-          "A bit of both, I am uncontrollable"),
+          "A bit of both"),
         selected = NA),
       
       shiny::hr(),
