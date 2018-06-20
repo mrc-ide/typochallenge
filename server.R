@@ -66,6 +66,11 @@ survey_panel <- function() {
       
       shiny::h4("A few questions before starting..."),
       
+      shiny::h6("We ask these questions so that..."), 
+      
+      shiny::textInput("today", "What is today's date?", value = "", 
+                       width = NULL, placeholder = NULL),
+      
       shiny::radioButtons(
         "gender",
         "Please select your gender",
