@@ -76,15 +76,18 @@ survey_panel <- function() {
         selected = NA),
       
       shiny::selectInput("year_birth", "Please select your year of birth:", 
-                         choices = c("Prefer not to say", 2018:1900)),
+                         choices = c("", 2018:1900),
+                         selectize = TRUE),
       
       shiny::selectInput("country_from", "Where are you from?", 
-                         choices = c("Prefer not to say", 
-                                     list_countries)),
+                            choices = c("", 
+                                        list_countries),
+                         selectize = TRUE),
       
       shiny::selectInput("country_residence", "Where do you currently live?", 
                          choices = c("Prefer not to say", 
-                                     list_countries)),
+                                     list_countries),
+                         selectize = TRUE),
       
       shiny::radioButtons(
         "survey_keyboard_layout",
