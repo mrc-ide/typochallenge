@@ -89,15 +89,22 @@ survey_panel <- function() {
                          selectize = TRUE),
       
       shiny::selectInput("country_residence", "Where do you currently live?", 
-                         choices = c("Prefer not to say", 
+                         choices = c("", 
                                      list_countries),
+                         selectize = TRUE),
+      
+      shiny::selectInput("device", "which device are you using to do the challenge?", 
+                         choices = c("", 
+                                     list("Computer", 
+                                          "Tablet", 
+                                          "Mobile phone")),
                          selectize = TRUE),
       
       shiny::radioButtons(
         "survey_keyboard_layout",
         "Please select your keyboard layout",
         c("AZERTY (top image)",
-          "QUERTY (bottom image)",
+          "QWERTY (bottom image)",
           "Other"),
         selected = NA),
       
@@ -286,6 +293,7 @@ shiny::shinyServer(
           year_birth = input$year_birth,
           country_from = input$country_from,
           country_residence = input$country_residence,
+          device = input$device,
           keyboard_layout = input$survey_keyboard_layout,
           keyboard_input = input$survey_keyboard_input)
         output$typoapp <- shiny::renderUI(challenge_panel())
