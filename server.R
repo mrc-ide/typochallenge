@@ -51,7 +51,7 @@ read_contribution <- function(p) {
 
 start_panel <- function() {
   shiny::tagList(
-    shiny::p("You have not yet started the challenge"),
+    shiny::p("Welcome! You have not yet started the challenge"),
     shiny::includeHTML("instructions.html"),
     shiny::p("To start the challenge, click on 'Start the challenge'"),
     shiny::p(shiny::tags$b("Good luck!")),
@@ -111,9 +111,19 @@ survey_panel <- function() {
         selected = NA),
       
       shiny::hr(),
-      shiny::actionButton("challenge", "To the typos!", class = "btn-primary")),
+      shiny::actionButton("instructions", "To the typos!", class = "btn-primary")),
     shiny::mainPanel(
       shiny::img(src = "layouts.png")))
+}
+
+instructions_panel <- function() {
+  shiny::tagList(
+    shiny::p("You have not yet started the challenge"),
+    shiny::includeHTML("instructions.html"),
+    shiny::p("To start the challenge, click on 'Start the challenge'"),
+    shiny::p(shiny::tags$b("Good luck!")),
+    shiny::actionButton("challenge", "Start the challenge", class = "btn-primary"),
+    shiny::includeHTML("doc_sharing.html"))
 }
 
 
@@ -255,6 +265,12 @@ shiny::shinyServer(
       input$survey, {
         init_data(values)
         output$typoapp <- shiny::renderUI(survey_panel())
+      })
+    
+    shiny::observeEvent(
+      input$instructions, {
+        init_data(values)
+        output$typoapp <- shiny::renderUI(instructions_panel())
       })
     
     shiny::observeEvent(
