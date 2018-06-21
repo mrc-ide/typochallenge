@@ -190,11 +190,11 @@ render_prev <- function(prev, data, global) {
         n_entered, ngettext(n_entered, "try", "tries"))
     } else {
       s1 <- sprintf(
-        "You have recorded %d correct %s (out of %d %s).",
+        "You have recorded %d correct %s (out of %d %s).\n",
         data$n_correct, ngettext(data$n_correct, "date", "dates"),
         n_entered, ngettext(n_entered, "try", "tries"))
       s2 <- sprintf(
-        "This answer: %ss, best time, %ss, average %ss.",
+        "This answer: %ss, best time, %ss, average %ss.\n",
         round(prev$elapsed, 2),
         round(data$time_best, 2),
         round(data$time_total / n_entered, 2))
@@ -202,11 +202,14 @@ render_prev <- function(prev, data, global) {
         s3 <- ""
       } else {
         s3 <- sprintf(
-          "All time average: %s dates, %s correct, %ss fastest, %ss average.",
-          round(global$total_mean, 2), round(global$correct_mean, 2),
+          "Average number of entries: %s dates, %s correct.", 
+          round(global$total_mean, 2), round(global$correct_mean, 2))
+        s4 <- sprintf(
+          "Speed:  %ss fastest, %ss average.",
           round(global$best_mean, 2), round(global$mean_mean, 2))
       }
-      body_stats <- paste(s1, s2, s3)
+      body_stats <- lapply(list(s1, s2), shiny::p)
+      all_time_stats <- lapply(list(s3, s4), shiny::p)
     }
     
     shiny::div(
@@ -218,7 +221,11 @@ render_prev <- function(prev, data, global) {
       shiny::div(
         class = "panel panel-info",
         shiny::div(class = "panel-heading", "Your statistics"),
-        shiny::div(class = "panel-body", body_stats)))
+        shiny::div(class = "panel-body", body_stats)),
+    shiny::div(
+      class = "panel panel-info",
+      shiny::div(class = "panel-heading", "All time statistics"),
+      shiny::div(class = "panel-body", all_time_stats)))
   }
 }
 
