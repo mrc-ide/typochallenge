@@ -93,7 +93,7 @@ survey_panel <- function() {
                                      list_countries),
                          selectize = TRUE),
       
-      shiny::selectInput("device", "which device are you using to do the challenge?", 
+      shiny::selectInput("device", "Which device are you using to do the challenge?", 
                          choices = c("", 
                                      list("Computer", 
                                           "Tablet", 
@@ -102,17 +102,17 @@ survey_panel <- function() {
       
       shiny::radioButtons(
         "survey_keyboard_layout",
-        "Please select your keyboard layout",
-        c("AZERTY (top image)",
-          "QWERTY (bottom image)",
+        "Please select your keyboard layout (see image on right panel)",
+        c("AZERTY (top)",
+          "QWERTY (bottom)",
           "Other"),
         selected = NA),
       
       shiny::radioButtons(
         "survey_keyboard_input",
-        "Do you use the numeric keypad or the row of numbers to enter numbers",
-        c("Top row (blue keys in image, on top)",
-          "Numeric keypad (purple keys in image, on right)",
+        "Do you use the numeric keypad or the row of numbers to enter numbers (see image on right panel)",
+        c("Top row (blue keys, top of keyboard)",
+          "Numeric keypad (purple keys, right of keyboard)",
           "A bit of both"),
         selected = NA),
       
