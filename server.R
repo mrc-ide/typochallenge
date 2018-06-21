@@ -51,9 +51,8 @@ read_contribution <- function(p) {
 
 start_panel <- function() {
   shiny::tagList(
-    shiny::p("Welcome! You have not yet started the challenge"),
-    shiny::includeHTML("instructions.html"),
-    shiny::p("To start the challenge, click on 'Start the challenge'"),
+    shiny::includeHTML("Overview.html"),
+    shiny::p("To start, click on 'Start the challenge'"),
     shiny::p(shiny::tags$b("Good luck!")),
     shiny::actionButton("survey", "Start the challenge", class = "btn-primary"),
     shiny::includeHTML("doc_sharing.html"))
