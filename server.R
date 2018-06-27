@@ -183,11 +183,13 @@ render_prev <- function(prev, data, global) {
       title <- "Last entry was correct"
       body_feedback <- sprintf("You entered '%s' correctly", date_real)
       type <- "success"
+      icon <- "check"
     } else {
       title <- "Typo in previous entry"
       body_feedback <- sprintf("You entered '%s' but the real date was '%s'",
                                prev$user, date_real)
       type <- "danger"
+      icon <- "times"
     }
     
     n_entered <- length(data$rows)
@@ -224,15 +226,21 @@ render_prev <- function(prev, data, global) {
       class = "panel-group",
       shiny::div(
         class = sprintf("panel panel-%s", type),
-        shiny::div(class = "panel-heading", title),
+        shiny::div(class = "panel-heading",
+                   shiny::icon(paste(icon, "fa-lg")),
+                   title),
         shiny::div(class = "panel-body", body_feedback)),
       shiny::div(
         class = "panel panel-info",
-        shiny::div(class = "panel-heading", "Your statistics"),
+        shiny::div(class = "panel-heading",
+                   shiny::icon(paste("cog", "fa-lg")),
+                   "Your statistics"),
         shiny::div(class = "panel-body", body_stats)),
       shiny::div(
         class = "panel panel-info",
-        shiny::div(class = "panel-heading", "All time statistics"),
+        shiny::div(class = "panel-heading",
+                   shiny::icon(paste("cogs", "fa-lg")),
+                   "All time statistics"),
         shiny::div(class = "panel-body", all_time_stats)))
   }
 }
