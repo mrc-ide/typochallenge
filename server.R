@@ -155,7 +155,7 @@ challenge_panel <- function() {
 
 end_panel <- function() {
   shiny::tagList(
-    shiny::includeMarkdown("doc_end.md"),
+    shiny::includeHTML("doc_end.html"),
     shiny::actionButton("restart", "Restart challenge?", class = "btn-primary"),
     shiny::includeHTML("doc_sharing.html"))
 }
