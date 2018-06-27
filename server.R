@@ -205,17 +205,18 @@ render_prev <- function(prev, data, global) {
         round(prev$elapsed, 2),
         round(data$time_best, 2),
         round(data$time_total / n_entered, 2))
-      if (is.null(global)) {
-        s3 <- ""
-      } else {
-        s3 <- sprintf(
-          "Average number of entries: %s dates, %s correct.", 
-          round(global$total_mean, 2), round(global$correct_mean, 2))
-        s4 <- sprintf(
-          "Speed:  %ss fastest, %ss average.",
-          round(global$best_mean, 2), round(global$mean_mean, 2))
-      }
       body_stats <- lapply(list(s1, s2), shiny::p)
+    }
+
+    if (is.null(global)) {
+      all_time_stats <- "You are the first to take the challenge!"
+    } else {
+      s3 <- sprintf(
+        "Average number of entries: %s dates, %s correct.",
+        round(global$total_mean, 2), round(global$correct_mean, 2))
+      s4 <- sprintf(
+        "Speed:  %ss fastest, %ss average.",
+        round(global$best_mean, 2), round(global$mean_mean, 2))
       all_time_stats <- lapply(list(s3, s4), shiny::p)
     }
     
@@ -229,10 +230,10 @@ render_prev <- function(prev, data, global) {
         class = "panel panel-info",
         shiny::div(class = "panel-heading", "Your statistics"),
         shiny::div(class = "panel-body", body_stats)),
-    shiny::div(
-      class = "panel panel-info",
-      shiny::div(class = "panel-heading", "All time statistics"),
-      shiny::div(class = "panel-body", all_time_stats)))
+      shiny::div(
+        class = "panel panel-info",
+        shiny::div(class = "panel-heading", "All time statistics"),
+        shiny::div(class = "panel-body", all_time_stats)))
   }
 }
 
