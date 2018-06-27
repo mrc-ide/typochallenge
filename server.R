@@ -291,7 +291,6 @@ shiny::shinyServer(
     
     shiny::observeEvent(
       input$instructions, {
-        init_data(values)
         output$typoapp <- shiny::renderUI(instructions_panel())
       })
     
