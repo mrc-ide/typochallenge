@@ -156,7 +156,10 @@ challenge_panel <- function() {
 end_panel <- function() {
   shiny::tagList(
     shiny::includeHTML("doc_end.html"),
-    shiny::actionButton("restart", "Restart challenge?", class = "btn-primary"),
+    shiny::actionButton("restart", "Restart challenge?",
+                        class = "btn-primary"),
+    shiny::actionButton("continue", "Continue challenge?",
+                        class = "btn-success"),
     shiny::includeHTML("doc_sharing.html"))
 }
 
@@ -345,7 +348,14 @@ shiny::shinyServer(
       input$restart, {
         output$typoapp <- shiny::renderUI(start_panel())
       })
-    
+
+    shiny::observeEvent(
+      input$continue, {
+        restore_data(values)
+        output$typoapp <- shiny::renderUI(challenge_panel())
+        values$date <- new_date()
+      })
+
     output$typoapp <- shiny::renderUI(start_panel())
     
     session$onSessionEnded(function() {
@@ -373,18 +383,34 @@ data_to_table <- function(data) {
 }
 
 
+nms_save <- c("id", "start_time", "survey", "continued", "data")
+
+
 save_data <- function(values, clean_exit, path) {
   if (!is.null(values$data)) {
     message(sprintf("Saving data for '%s'", values$id))
     dir.create(path, FALSE, TRUE)
+    values$last <- setNames(lapply(nms_save, function(v) values[[v]]),
+                            nms_save)
     ret <- list(id = values$id,
                 start_time = values$start_time,
                 app_version = APP_VERSION,
                 clean_exit = clean_exit,
                 survey = values$survey,
+                continued = !isTRUE(values$continued),
                 data = data_to_table(values$data))
     dest <- file.path(path, sprintf("%s.rds", ret$id))
     saveRDS(ret, dest)
     values$data <- NULL
   }
+}
+
+
+restore_data <- function(values) {
+  last <- values$last
+  message(sprintf("Restoring data for '%s'", last$id))
+  for (v in nms_save) {
+    values[[v]] <- last[[v]]
+  }
+  values$continued <- TRUE
 }
