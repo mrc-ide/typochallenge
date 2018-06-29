@@ -156,10 +156,18 @@ challenge_panel <- function() {
 end_panel <- function() {
   shiny::tagList(
     shiny::includeHTML("doc_end.html"),
-    shiny::actionButton("restart", "Restart challenge?",
-                        class = "btn-primary"),
     shiny::actionButton("continue", "Continue challenge?",
-                        class = "btn-success"),
+                        shiny::icon("play"),
+                        class = "btn-success",
+                        title = "Continue, keeping your statistics"),
+    shiny::actionButton("retry", "Retry challenge?",
+                        shiny::icon("refresh"),
+                        class = "btn-primary",
+                        title = "Restart challenge (but keep survey data)"),
+    shiny::actionButton("new_user", "New user",
+                        shiny::icon("user-plus"),
+                        class = "btn-danger",
+                        title = "Start as new user"),
     shiny::includeHTML("doc_sharing.html"))
 }
 
