@@ -163,7 +163,7 @@ end_panel <- function() {
     shiny::actionButton("retry", "Retry challenge?",
                         shiny::icon("refresh"),
                         class = "btn-primary",
-                        title = "Restart challenge (but keep survey data)"),
+                        title = "Retry challenge (but keep survey data)"),
     shiny::actionButton("new_user", "New user",
                         shiny::icon("user-plus"),
                         class = "btn-danger",
@@ -353,8 +353,18 @@ shiny::shinyServer(
       })
     
     shiny::observeEvent(
-      input$restart, {
+      input$new_user, {
         output$typoapp <- shiny::renderUI(start_panel())
+      })
+
+    shiny::observeEvent(
+      input$retry, {
+        last <- values$last
+        init_data(values)
+        values$survey <- last$survey
+        values$id_parent <- last$id_parent %||% last$id
+        output$typoapp <- shiny::renderUI(challenge_panel())
+        values$date <- new_date()
       })
 
     shiny::observeEvent(
@@ -391,7 +401,7 @@ data_to_table <- function(data) {
 }
 
 
-nms_save <- c("id", "start_time", "survey", "continued", "data")
+nms_save <- c("id", "start_time", "survey", "continued", "data", "id_parent")
 
 
 save_data <- function(values, clean_exit, path) {
@@ -401,6 +411,7 @@ save_data <- function(values, clean_exit, path) {
     values$last <- setNames(lapply(nms_save, function(v) values[[v]]),
                             nms_save)
     ret <- list(id = values$id,
+                id_parent = values$id_parent,
                 start_time = values$start_time,
                 app_version = APP_VERSION,
                 clean_exit = clean_exit,
@@ -421,4 +432,9 @@ restore_data <- function(values) {
     values[[v]] <- last[[v]]
   }
   values$continued <- TRUE
+}
+
+
+`%||%` <- function(a, b) {
+  if (is.null(a)) b else a
 }
