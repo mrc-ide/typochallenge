@@ -9,9 +9,9 @@ cache <- new.env(parent = emptyenv())
 
 read_contributions <- function() {
   d <- lapply(dir(PATH_OUTPUT, pattern = "\\.rds$"), read_contribution)
-  i <- vapply(d, is.null, logical(1))
+  i <- !vapply(d, is.null, logical(1))
   if (any(i)) {
-    d <- d[!i]
+    d <- d[i]
     s <- do.call("rbind", d)
     list(total_sum = as.integer(sum(s[, "total"])),
          total_mean = mean(s[, "total"]),
