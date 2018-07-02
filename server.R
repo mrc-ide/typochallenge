@@ -118,26 +118,26 @@ challenge_panel <- function() {
 
 
 end_panel <- function(data, global) {
-  shiny::tagList(
-    shiny::includeHTML("doc_end.html"),
-
-    shiny::div(
-      class = "panel-group",
-      panel_statistics(data, global)),
-
-    shiny::actionButton("continue", "Continue challenge?",
-                        shiny::icon("play"),
-                        class = "btn-success",
-                        title = "Continue, keeping your statistics"),
-    shiny::actionButton("retry", "Retry challenge?",
-                        shiny::icon("refresh"),
-                        class = "btn-primary",
-                        title = "Retry challenge (but keep survey data)"),
-    shiny::actionButton("new_user", "New user",
-                        shiny::icon("user-plus"),
-                        class = "btn-danger",
-                        title = "Start as new user"),
-    shiny::includeHTML("doc_sharing.html"))
+  shiny::sidebarLayout(
+    shiny::sidebarPanel(
+      shiny::div(
+        class = "panel-group",
+        panel_statistics(data, global)),
+      shiny::actionButton("continue", "Continue?",
+                          shiny::icon("play"),
+                          class = "btn-success",
+                          title = "Continue, keeping your statistics"),
+      shiny::actionButton("retry", "Retry?",
+                          shiny::icon("refresh"),
+                          class = "btn-primary",
+                          title = "Retry challenge (but keep survey data)"),
+      shiny::actionButton("new_user", "New user",
+                          shiny::icon("user-plus"),
+                          class = "btn-danger",
+                          title = "Start as new user")),
+    shiny::mainPanel(
+      shiny::includeHTML("doc_end.html"),
+      shiny::includeHTML("doc_sharing.html")))
 }
 
 
@@ -378,8 +378,8 @@ shiny::shinyServer(
     
     shiny::observeEvent(
       input$end, {
-        save_data(values, TRUE, PATH_OUTPUT)
         output$typoapp <- shiny::renderUI(end_panel(values$data, values$global))
+        save_data(values, TRUE, PATH_OUTPUT)
       })
     
     shiny::observeEvent(
@@ -409,8 +409,8 @@ shiny::shinyServer(
     session$onSessionEnded(function() {
       isolate({
         message(sprintf("Detected session closed for '%s'", values$id))
-        save_data(values, FALSE, PATH_OUTPUT)
         output$typoapp <- shiny::renderUI(end_panel(values$data, values$global))
+        save_data(values, FALSE, PATH_OUTPUT)
       })
     })
   }
