@@ -302,7 +302,7 @@ init_data <- function(values) {
   values$date <- NULL
   values$prev <- NULL
   values$data <- list()
-  values$global <- read_contributions()
+  values$global <- read_contributions(cache = cache)
   message(sprintf("Starting session: '%s'", values$id))
 }
 
