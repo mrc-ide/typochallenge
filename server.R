@@ -378,8 +378,11 @@ shiny::shinyServer(
     
     shiny::observeEvent(
       input$end, {
-        output$typoapp <- shiny::renderUI(end_panel(values$data, values$global))
-        save_data(values, TRUE, PATH_OUTPUT)
+        shiny::isolate({
+          data <- values$data
+          output$typoapp <- shiny::renderUI(end_panel(data, data$global))
+          save_data(values, TRUE, PATH_OUTPUT)
+        })
       })
     
     shiny::observeEvent(
@@ -409,8 +412,11 @@ shiny::shinyServer(
     session$onSessionEnded(function() {
       isolate({
         message(sprintf("Detected session closed for '%s'", values$id))
-        output$typoapp <- shiny::renderUI(end_panel(values$data, values$global))
-        save_data(values, FALSE, PATH_OUTPUT)
+        shiny::isolate({
+          data <- values$data
+          output$typoapp <- shiny::renderUI(end_panel(data, data$global))
+          save_data(values, TRUE, PATH_OUTPUT)
+        })
       })
     })
   }
