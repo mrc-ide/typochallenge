@@ -277,6 +277,7 @@ update_data <- function(prev, data) {
 
 init_data <- function(values) {
   values$id <- uuid::UUIDgenerate()
+  values$parent_id <- NULL
   values$start_time <- Sys.time()
   values$survey <- NULL
   values$timestamp <- NULL
