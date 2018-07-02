@@ -180,6 +180,37 @@ render_prev <- function(prev, data, global) {
         round(data$time_total / n_correct, 2))
       body_stats <- lapply(list(s1, s2), shiny::p)
     }
+    
+    trophy_levels <- c(0, 5, 10, 50, 100, 500, 1000, 5000)
+    # trophy_levels <- c(0, 1, 2, 5, 10, 50, 100, 500, 1000, 5000) # for debugging
+    trophy_entered <- max(which(n_entered >= trophy_levels)) - 1
+    if(any(n_correct >= trophy_levels)) {
+      trophy_correct <- max(which(n_correct >= trophy_levels)) - 1
+    } else {
+      trophy_correct <- 0
+    }
+    
+    if (trophy_correct == 0) {
+      trophies <- "Keep going to get your first trophy!"
+    } else {
+      s6 <- sprintf(
+        "Level %s: total number of entries > %s", 
+        trophy_entered,
+        trophy_levels[trophy_entered + 1])
+      args <- lapply(seq_len(trophy_entered), function(e) shiny::icon(paste("trophy", "fa-lg")))
+      args[[trophy_entered + 1]] <- s6
+      s6_troph <- do.call(shiny::p, args)
+      s7 <- sprintf(
+        "Level %s: total number of correct entries > %s", 
+        trophy_correct,
+        trophy_levels[trophy_correct + 1])
+      args <- lapply(seq_len(trophy_correct), function(e) shiny::icon(paste("trophy", "fa-lg")))
+      args[[trophy_correct + 1]] <- s7
+      s7_troph <- do.call(shiny::p, args)
+      trophies <- lapply(list(s6_troph, s7_troph), shiny::p)
+      
+    }
+    
 
     if (is.null(global)) {
       all_time_stats <- "You are the first to take the challenge!"
@@ -210,6 +241,12 @@ render_prev <- function(prev, data, global) {
                    shiny::icon(paste("cog", "fa-lg")),
                    "Your statistics"),
         shiny::div(class = "panel-body", body_stats)),
+      shiny::div(
+        class = "panel panel-info",
+        shiny::div(class = "panel-heading",
+                   shiny::icon(paste("trophy", "fa-lg")),
+                   "Your achievements"),
+        shiny::div(class = "panel-body", trophies)),
       shiny::div(
         class = "panel panel-info",
         shiny::div(class = "panel-heading",
