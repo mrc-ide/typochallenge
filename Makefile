@@ -1,3 +1,8 @@
+all: bootstrap rmnist_data
+
+rmnist_data:
+	Rscript -e 'rmnist::download_mnist()'
+
 bootstrap:
 	Rscript -e "provisionr::provision_dependencies_bootstrap(src = provisionr::package_sources(github = 'richfitz/rmnist'))"
 
