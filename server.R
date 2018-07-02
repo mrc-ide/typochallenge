@@ -1,13 +1,13 @@
 source("plot.R")
+source("functions.R")
 
 APP_VERSION <- "1.0.0"
 PATH_OUTPUT <- "contributions"
-list_countries <- readLines("countries.txt")
 DEVEL_VERSION <- TRUE
+COUNTRIES <- readLines("countries.txt")
 
 cache <- new.env(parent = emptyenv())
 
-source("functions.R")
 
 start_panel <- function() {
   shiny::tagList(
@@ -44,15 +44,16 @@ survey_panel <- function() {
       
       shiny::selectInput("country_from", "Where are you from?", 
                             choices = c("", 
-                                        list_countries),
+                                        COUNTRIES),
                          selectize = TRUE),
       
       shiny::selectInput("country_residence", "Where do you currently live?", 
                          choices = c("", 
-                                     list_countries),
+                                     COUNTRIES),
                          selectize = TRUE),
       
-      shiny::selectInput("device", "Which device are you using to do the challenge?", 
+      shiny::selectInput("device",
+                         "Which device are you using to do the challenge?",
                          choices = c("", 
                                      list("Computer", 
                                           "Tablet", 
