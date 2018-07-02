@@ -71,7 +71,9 @@ build_cache <- function(path_output = "contributions") {
   path_cache <- file.path(path_output, ".cache.rds")
   unlink(path_cache)
   files <- dir(path_output, pattern = "\\.rds$")
-  d <- lapply(files, read_contribution, path_output, NULL)
-  names(d) <- files
-  saveRDS(d, path_cache)
+  if (length(files) > 0L) {
+    d <- lapply(files, read_contribution, path_output, NULL)
+    names(d) <- files
+    saveRDS(d, path_cache)
+  }
 }
