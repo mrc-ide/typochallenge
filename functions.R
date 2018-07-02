@@ -3,7 +3,13 @@ read_contributions <- function(path_output = "contributions") {
   i <- !vapply(d, is.null, logical(1))
   if (any(i)) {
     d <- d[i]
-    s <- do.call("rbind", d)
+    s <- as.data.frame(do.call("rbind", d))
+    ### need to convert numeric columns to numeric ###
+    s[, "total"] <- as.numeric(as.character(s[, "total"]))
+    s[, "correct"] <- as.numeric(as.character(s[, "correct"]))
+    s[, "best"] <- as.numeric(as.character(s[, "best"]))
+    s[, "mean"] <- as.numeric(as.character(s[, "mean"]))
+    
     if (all(is.na(s[, "best"]))) {
       ## Still just testing here.
       return(NULL)
@@ -17,7 +23,8 @@ read_contributions <- function(path_output = "contributions") {
          best_best = min(s[, "best"], na.rm = TRUE),
          best_mean = mean(s[, "best"], na.rm = TRUE),
          best_mean = min(s[, "mean"], na.rm = TRUE),
-         mean_mean = mean(s[, "mean"], na.rm = TRUE))
+         mean_mean = mean(s[, "mean"], na.rm = TRUE),
+         n_contributions = length(unique(s[, "id_parent"])))
   } else {
     NULL
   }
@@ -33,7 +40,9 @@ read_contribution <- function(p, path_output = "contributions",
   i <- d$data$correct
   if (length(i) > 0L) {
     t <- d$data$elapsed[i]
-    ret <- c(total = length(i),
+    ret <- c(id = d$id, 
+             id_parent = ifelse(is.null(d$id_parent), d$id, d$id_parent),
+             total = length(i),
              correct = sum(i),
              best = if (any(i)) min(t) else NA_real_,
              mean = if (any(i)) mean(t) else NA_real_)

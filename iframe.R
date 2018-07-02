@@ -42,9 +42,7 @@ plot_iframe <- function(n_target = c(5000, 10000, 20000, 50000),
   mtext(txt, side = 1, cex = 2, col = col2)
   txt2 <- sprintf("of our %d target,", my_target)
   mtext(txt2, side = 1, line = 1.5, cex = 1.5)
-  ### TO DO: add dynamic numnber of participants
-  n_partic <- 10
-  txt3 <- sprintf("by %d participants", n_partic)
+  txt3 <- sprintf("by %d contributors", d$n_contributions)
   mtext(txt3, side = 1, line = 3, cex = 1.5)
   
   ## add text at top
