@@ -3,6 +3,7 @@ source("plot.R")
 APP_VERSION <- "1.0.0"
 PATH_OUTPUT <- "contributions"
 list_countries <- readLines("countries.txt")
+DEVEL_VERSION <- TRUE
 
 cache <- new.env(parent = emptyenv())
 
@@ -99,6 +100,10 @@ challenge_panel <- function() {
       shiny::textInput("challenge_date", "Type the date", ""),
       shiny::actionButton("challenge_submit", "Submit this answer",
                           class = "btn-primary"),
+      if (DEVEL_VERSION) {
+        shiny::actionButton("devel_correct_date", "CHEAT!",
+                            class = "btn-warning")
+      },
       shiny::hr(),
       shiny::includeHTML("instructions_short.html"),
       shiny::hr(),
@@ -332,6 +337,15 @@ shiny::shinyServer(
           values$date <- new_date()
         })
       })
+
+    if (DEVEL_VERSION) {
+      shiny::observeEvent(
+        input$devel_correct_date, {
+          correct <- format(values$date$date, format = "%d/%m/%Y")
+          shiny::updateTextInput(session, "challenge_date",
+                                 value = correct)
+        })
+    }
     
     shiny::observe({
       if (!is.null(values$date)) {
