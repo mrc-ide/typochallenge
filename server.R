@@ -411,12 +411,14 @@ shiny::shinyServer(
     
     session$onSessionEnded(function() {
       isolate({
-        message(sprintf("Detected session closed for '%s'", values$id))
-        shiny::isolate({
-          data <- values$data
-          output$typoapp <- shiny::renderUI(end_panel(data, data$global))
-          save_data(values, TRUE, PATH_OUTPUT)
-        })
+        if (!is.null(values$data)) {
+          message(sprintf("Detected session closed for '%s'", values$id))
+          shiny::isolate({
+            data <- values$data
+            output$typoapp <- shiny::renderUI(end_panel(data, data$global))
+            save_data(values, TRUE, PATH_OUTPUT)
+          })
+        }
       })
     })
   }
