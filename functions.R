@@ -1,5 +1,17 @@
-read_contributions <- function(path_output = "contributions") {
-  d <- lapply(dir(path_output, pattern = "\\.rds$"), read_contribution, path_output)
+read_contributions <- function(path_output = "contributions", cache = NULL) {
+  path_cache <- file.path(path_output, ".cache.rds")
+  if (file.exists(path_cache)) {
+    d <- readRDS(path_cache)
+  } else {
+    d <- NULL
+  }
+
+  files <- dir(path_output, pattern = "\\.rds$")
+  files_new <- setdiff(files, names(d))
+  d <- c(
+    unname(d),
+    lapply(files_new, read_contribution, path_output, cache))
+
   i <- !vapply(d, is.null, logical(1))
   if (any(i)) {
     d <- d[i]
@@ -31,8 +43,7 @@ read_contributions <- function(path_output = "contributions") {
 }
 
 
-read_contribution <- function(p, path_output = "contributions", 
-                              cache = new.env(parent = emptyenv())) {
+read_contribution <- function(p, path_output = "contributions", cache = NULL) {
   if (p %in% names(cache)) {
     return(cache[[p]])
   }
@@ -49,6 +60,18 @@ read_contribution <- function(p, path_output = "contributions",
   } else {
     ret <- NULL
   }
-  cache[[p]] <- ret
+  if (!is.null(cache)) {
+    cache[[p]] <- ret
+  }
   ret
+}
+
+
+build_cache <- function(path_output = "contributions") {
+  path_cache <- file.path(path_output, ".cache.rds")
+  unlink(path_cache)
+  files <- dir(path_output, pattern = "\\.rds$")
+  d <- lapply(files, read_contribution, path_output, NULL)
+  names(d) <- files
+  saveRDS(d, path_cache)
 }
