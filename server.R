@@ -2,8 +2,7 @@ source("plot.R")
 
 APP_VERSION <- "1.0.0"
 PATH_OUTPUT <- "contributions"
-
-list_countries <- sort(rworldmap::countryExData[ , 2])
+list_countries <- readLines("countries.txt")
 
 cache <- new.env(parent = emptyenv())
 
