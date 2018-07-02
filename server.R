@@ -117,9 +117,14 @@ challenge_panel <- function() {
 }
 
 
-end_panel <- function() {
+end_panel <- function(data, global) {
   shiny::tagList(
     shiny::includeHTML("doc_end.html"),
+
+    shiny::div(
+      class = "panel-group",
+      panel_statistics(data, global)),
+
     shiny::actionButton("continue", "Continue challenge?",
                         shiny::icon("play"),
                         class = "btn-success",
@@ -168,6 +173,20 @@ render_prev <- function(prev, data, global) {
       icon <- "times"
     }
     
+    shiny::div(
+      class = "panel-group",
+      shiny::div(
+        class = sprintf("panel panel-%s", type),
+        shiny::div(class = "panel-heading",
+                   shiny::icon(paste(icon, "fa-lg")),
+                   title),
+        shiny::div(class = "panel-body", body_feedback)),
+      panel_statistics(data, global))
+  }
+}
+
+
+panel_statistics <- function(data, global) {
     n_entered <- length(data$rows)
     n_correct <- data$n_correct
     if (is.null(data$time_best)) {
@@ -186,13 +205,14 @@ render_prev <- function(prev, data, global) {
       body_stats <- lapply(list(s1, s2), shiny::p)
     }
     
-    trophy_levels <- c(0, 5, 10, 50, 100, 500, 1000, 5000)
-    # trophy_levels <- c(0, 1, 2, 5, 10, 50, 100, 500, 1000, 5000) # for debugging
-    trophy_entered <- max(which(n_entered >= trophy_levels)) - 1
-    if(any(n_correct >= trophy_levels)) {
-      trophy_correct <- max(which(n_correct >= trophy_levels)) - 1
+    trophy_levels <- c(0,
+                       if (DEVEL_VERSION) 1, 2,
+                       5, 10, 50, 100, 500, 1000, 5000)
+    trophy_entered <- max(which(n_entered >= trophy_levels)) - 1L
+    if (any(n_correct >= trophy_levels)) {
+      trophy_correct <- max(which(n_correct >= trophy_levels)) - 1L
     } else {
-      trophy_correct <- 0
+      trophy_correct <- 0L
     }
     
     if (trophy_correct == 0) {
@@ -202,20 +222,20 @@ render_prev <- function(prev, data, global) {
         "Level %s: total number of entries > %s", 
         trophy_entered,
         trophy_levels[trophy_entered + 1])
-      args <- lapply(seq_len(trophy_entered), function(e) shiny::icon(paste("trophy", "fa-lg")))
+      args <- lapply(seq_len(trophy_entered), function(e)
+        shiny::icon(paste("trophy", "fa-lg")))
       args[[trophy_entered + 1]] <- s6
       s6_troph <- do.call(shiny::p, args)
       s7 <- sprintf(
         "Level %s: total number of correct entries > %s", 
         trophy_correct,
         trophy_levels[trophy_correct + 1])
-      args <- lapply(seq_len(trophy_correct), function(e) shiny::icon(paste("trophy", "fa-lg")))
+      args <- lapply(seq_len(trophy_correct), function(e)
+        shiny::icon(paste("trophy", "fa-lg")))
       args[[trophy_correct + 1]] <- s7
       s7_troph <- do.call(shiny::p, args)
       trophies <- lapply(list(s6_troph, s7_troph), shiny::p)
-      
     }
-    
 
     if (is.null(global)) {
       all_time_stats <- "You are the first to take the challenge!"
@@ -231,34 +251,26 @@ render_prev <- function(prev, data, global) {
         round(global$best_mean, 2), round(global$mean_mean, 2))
       all_time_stats <- lapply(list(s3, s4, s5), shiny::p)
     }
-    
+
+  shiny::tagList(
     shiny::div(
-      class = "panel-group",
-      shiny::div(
-        class = sprintf("panel panel-%s", type),
-        shiny::div(class = "panel-heading",
-                   shiny::icon(paste(icon, "fa-lg")),
-                   title),
-        shiny::div(class = "panel-body", body_feedback)),
-      shiny::div(
-        class = "panel panel-info",
-        shiny::div(class = "panel-heading",
-                   shiny::icon(paste("cog", "fa-lg")),
-                   "Your statistics"),
-        shiny::div(class = "panel-body", body_stats)),
-      shiny::div(
-        class = "panel panel-info",
-        shiny::div(class = "panel-heading",
-                   shiny::icon(paste("trophy", "fa-lg")),
-                   "Your achievements"),
-        shiny::div(class = "panel-body", trophies)),
-      shiny::div(
-        class = "panel panel-info",
-        shiny::div(class = "panel-heading",
-                   shiny::icon(paste("cogs", "fa-lg")),
-                   "All time statistics (excluding this session)"),
-        shiny::div(class = "panel-body", all_time_stats)))
-  }
+      class = "panel panel-info",
+      shiny::div(class = "panel-heading",
+                 shiny::icon(paste("cog", "fa-lg")),
+                 "Your statistics"),
+      shiny::div(class = "panel-body", body_stats)),
+    shiny::div(
+      class = "panel panel-info",
+      shiny::div(class = "panel-heading",
+                 shiny::icon(paste("trophy", "fa-lg")),
+                 "Your achievements"),
+      shiny::div(class = "panel-body", trophies)),
+    shiny::div(
+      class = "panel panel-info",
+      shiny::div(class = "panel-heading",
+                 shiny::icon(paste("cogs", "fa-lg")),
+                 "All time statistics (excluding this session)"),
+      shiny::div(class = "panel-body", all_time_stats)))
 }
 
 
@@ -367,7 +379,7 @@ shiny::shinyServer(
     shiny::observeEvent(
       input$end, {
         save_data(values, TRUE, PATH_OUTPUT)
-        output$typoapp <- shiny::renderUI(end_panel())
+        output$typoapp <- shiny::renderUI(end_panel(values$data, values$global))
       })
     
     shiny::observeEvent(
@@ -398,7 +410,7 @@ shiny::shinyServer(
       isolate({
         message(sprintf("Detected session closed for '%s'", values$id))
         save_data(values, FALSE, PATH_OUTPUT)
-        output$typoapp <- shiny::renderUI(end_panel())
+        output$typoapp <- shiny::renderUI(end_panel(values$data, values$global))
       })
     })
   }
