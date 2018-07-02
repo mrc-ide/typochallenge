@@ -175,7 +175,7 @@ render_prev <- function(prev, data, global) {
         n_correct, ngettext(n_correct, "date", "dates"),
         n_entered, ngettext(n_entered, "try", "tries"))
       s2 <- sprintf(
-        "For correct answers, best time %ss, average time %ss.\n",
+        "Speed (per correct entry): fastest %ss, average %ss.\n",
         round(data$time_best, 2),
         round(data$time_total / n_correct, 2))
       body_stats <- lapply(list(s1, s2), shiny::p)
@@ -185,12 +185,15 @@ render_prev <- function(prev, data, global) {
       all_time_stats <- "You are the first to take the challenge!"
     } else {
       s3 <- sprintf(
-        "Average number of entries: %s dates, %s correct.",
-        round(global$total_mean, 2), round(global$correct_mean, 2))
+        "Total number of entries: %s dates, %s correct entries.",
+        round(global$total_sum, 2), round(global$correct_sum, 2))
       s4 <- sprintf(
-        "Speed:  %ss fastest, %ss average.",
+        "Average number of entries per contributor: %s dates, %s correct entries.",
+        round(global$total_mean, 2), round(global$correct_mean, 2))
+      s5 <- sprintf(
+        "Speed (per correct entry): fastest %ss, average %ss.",
         round(global$best_mean, 2), round(global$mean_mean, 2))
-      all_time_stats <- lapply(list(s3, s4), shiny::p)
+      all_time_stats <- lapply(list(s3, s4, s5), shiny::p)
     }
     
     shiny::div(
