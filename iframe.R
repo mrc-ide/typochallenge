@@ -5,6 +5,7 @@
 ## 50000 * 1% = 500 --> still ok sample size to work with
 
 plot_iframe <- function(n_target = c(5000, 10000, 20000, 50000), 
+                        start_date = as.Date("2018/09/3"),  
                         end_date = as.Date("2018/10/14"), 
                         col = "#660066",
                         col2 = "#cc00cc") {
@@ -24,7 +25,9 @@ plot_iframe <- function(n_target = c(5000, 10000, 20000, 50000),
   }
   
   png(filename = "iframe.png",
-      width = 400, height = 400)
+      width = 350, height = 400)
+  
+  par(mar = c(5, 0, 6, 0))
   
   ## plot polygons
   plot.new()
@@ -42,13 +45,19 @@ plot_iframe <- function(n_target = c(5000, 10000, 20000, 50000),
   mtext(txt, side = 1, cex = 2, col = col2)
   txt2 <- sprintf("of our %d target,", my_target)
   mtext(txt2, side = 1, line = 1.5, cex = 1.5)
-  txt3 <- sprintf("by %d contributors", d$n_contributions)
+  txt3 <- sprintf("thanks to %d contributors", d$n_contributions)
   mtext(txt3, side = 1, line = 3, cex = 1.5)
   
   ## add text at top
+  txt <- "Challenge live from"
+  txt2 <- sprintf("%s to %s", 
+                  format(start_date, "%d/%m/%y"), 
+                  format(end_date, "%d/%m/%y"))
+  mtext(txt, side = 3, line = 3, cex = 2, col = col)
+  mtext(txt2, side = 3, line = 1.5, cex = 2, col = col)
   n_days_remain <- as.numeric(end_date - as.Date(Sys.time()))
-  txt <- sprintf("%d days remaining", n_days_remain)
-  mtext(txt, side = 3, cex = 2, col = col)
+  txt3 <- sprintf("(%d days remaining)", n_days_remain)
+  mtext(txt3, side = 3, cex = 1.5)
   
   dev.off()
 }
