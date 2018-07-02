@@ -1,5 +1,5 @@
-read_contributions <- function(PATH_OUTPUT = "contributions") {
-  d <- lapply(dir(PATH_OUTPUT, pattern = "\\.rds$"), read_contribution, PATH_OUTPUT)
+read_contributions <- function(path_output = "contributions") {
+  d <- lapply(dir(path_output, pattern = "\\.rds$"), read_contribution, path_output)
   i <- !vapply(d, is.null, logical(1))
   if (any(i)) {
     d <- d[i]
@@ -24,11 +24,12 @@ read_contributions <- function(PATH_OUTPUT = "contributions") {
 }
 
 
-read_contribution <- function(p, PATH_OUTPUT = "contributions", cache = new.env(parent = emptyenv())) {
+read_contribution <- function(p, path_output = "contributions", 
+                              cache = new.env(parent = emptyenv())) {
   if (p %in% names(cache)) {
     return(cache[[p]])
   }
-  d <- readRDS(file.path(PATH_OUTPUT, p))
+  d <- readRDS(file.path(path_output, p))
   i <- d$data$correct
   if (length(i) > 0L) {
     t <- d$data$elapsed[i]
