@@ -315,7 +315,8 @@ shiny::shinyServer(
           country_residence = input$country_residence,
           device = input$device,
           keyboard_layout = input$survey_keyboard_layout,
-          keyboard_input = input$survey_keyboard_input)
+          keyboard_input = input$survey_keyboard_input, 
+          today = input$today)
         output$typoapp <- shiny::renderUI(challenge_panel())
         values$date <- new_date()
       })
