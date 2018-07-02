@@ -55,9 +55,8 @@ read_contribution <- function(p) {
 start_panel <- function() {
   shiny::tagList(
     shiny::includeHTML("overview.html"),
-    shiny::p("To start, click on 'Start the challenge'"),
-    shiny::p(shiny::tags$b("Good luck!")),
-    shiny::actionButton("survey", "Start the challenge", class = "btn-primary"),
+    shiny::actionButton("survey", "Begin!",
+                        shiny::icon("play"), class = "btn-primary"),
     shiny::includeHTML("doc_sharing.html"))
 }
 
@@ -129,9 +128,11 @@ instructions_panel <- function() {
   shiny::tagList(
     shiny::p("You have not yet started the challenge"),
     shiny::includeHTML("instructions.html"),
-    shiny::p("To start the challenge, click on 'Start the challenge'"),
+    shiny::p(
+      "To start the challenge, click on the 'Start the challenge' button"),
     shiny::p(shiny::tags$b("Good luck!")),
-    shiny::actionButton("challenge", "Start the challenge", class = "btn-primary"),
+    shiny::actionButton("challenge", "Start the challenge",
+                        class = "btn-primary"),
     shiny::includeHTML("doc_sharing.html"))
 }
 
@@ -140,7 +141,6 @@ challenge_panel <- function() {
   shiny::sidebarLayout(
     shiny::sidebarPanel(
       shiny::textInput("challenge_date", "Type the date", ""),
-      ## shiny::fluidRow("Press enter to submit", style = "margin-left: 0px;"),
       shiny::actionButton("challenge_submit", "Submit this answer",
                           class = "btn-primary"),
       shiny::hr(),
@@ -279,6 +279,7 @@ update_data <- function(prev, data) {
   data
 }
 
+
 init_data <- function(values) {
   values$id <- uuid::UUIDgenerate()
   values$parent_id <- NULL
@@ -291,6 +292,7 @@ init_data <- function(values) {
   values$global <- read_contributions()
   message(sprintf("Starting session: '%s'", values$id))
 }
+
 
 shiny::shinyServer(
   function(input, output, session) {
