@@ -191,7 +191,8 @@ render_prev <- function(prev, data, global) {
     date_real <- format(prev$date, "%d/%m/%Y")
     if (prev$correct) {
       title <- "Last entry was correct"
-      body_feedback <- sprintf("You entered '%s' correctly", date_real)
+      body_feedback <- sprintf("You entered '%s' correctly in %ss",
+                               date_real, round(prev$elapsed, 2))
       type <- "success"
       icon <- "check"
     } else {
@@ -203,6 +204,7 @@ render_prev <- function(prev, data, global) {
     }
     
     n_entered <- length(data$rows)
+    n_correct <- data$n_correct
     if (is.null(data$time_best)) {
       body_stats <- sprintf(
         "You have not recorded any correct dates (out of %d %s)",
@@ -210,13 +212,12 @@ render_prev <- function(prev, data, global) {
     } else {
       s1 <- sprintf(
         "You have recorded %d correct %s (out of %d %s).\n",
-        data$n_correct, ngettext(data$n_correct, "date", "dates"),
+        n_correct, ngettext(n_correct, "date", "dates"),
         n_entered, ngettext(n_entered, "try", "tries"))
       s2 <- sprintf(
-        "This answer: %ss, best time, %ss, average %ss.\n",
-        round(prev$elapsed, 2),
+        "For correct answers, best time %ss, average time %ss.\n",
         round(data$time_best, 2),
-        round(data$time_total / n_entered, 2))
+        round(data$time_total / n_correct, 2))
       body_stats <- lapply(list(s1, s2), shiny::p)
     }
 
@@ -250,7 +251,7 @@ render_prev <- function(prev, data, global) {
         class = "panel panel-info",
         shiny::div(class = "panel-heading",
                    shiny::icon(paste("cogs", "fa-lg")),
-                   "All time statistics"),
+                   "All time statistics (excluding this session)"),
         shiny::div(class = "panel-body", all_time_stats)))
   }
 }
