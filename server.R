@@ -199,8 +199,18 @@ date_has_plausible_number_of_characters <- function(typed_date)
   out
 }
 
+as_date <- function(x) {
+  re <- "^\\s*[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}\\s*$"
+  if (grepl(re, x)) {
+    as.Date(x, format = "%d/%m/%Y")
+  } else {
+    as.Date(NA)
+  }
+}
+
+
 check_date <- function(typed_date, date) {
-  isTRUE(as.Date(typed_date, format = "%d/%m/%Y") == date)
+  isTRUE(as_date(typed_date) == date)
 }
 
 
