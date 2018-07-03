@@ -177,28 +177,6 @@ validate_date <- function(user_date, real_date, start_time) {
   real_date
 }
 
-date_has_plausible_number_of_characters <- function(typed_date) 
-{
-  fields <- strsplit(typed_date, "/")[[1]]
-  out <- TRUE
-  if (length(fields) != 3) { # need 3 fields for day, month and year
-    out <- FALSE
-  } else
-  {
-    # accept 1 or 2 digits for day in month
-    day_wrong <- !(nchar(fields[1]) %in% c(1, 2)) 
-    # accept 1 or 2 digits for month
-    month_wrong <- !(nchar(fields[2]) %in% c(1, 2)) 
-    # accept only 4 digits for year
-    year_wrong <- !(nchar(fields[2]) %in% 4) 
-   if (day_wrong | month_wrong | year_wrong) { 
-     out <- FALSE
-   } 
-  }
-  
-  out
-}
-
 as_date <- function(x) {
   re <- "^\\s*[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}\\s*$"
   if (grepl(re, x)) {
