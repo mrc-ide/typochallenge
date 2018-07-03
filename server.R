@@ -85,7 +85,7 @@ survey_panel <- function() {
                          choices = c("", 
                                      list("Computer", 
                                           "Tablet", 
-                                          "Mobile phone")),
+                                          "Other")),
                          selectize = TRUE),
       
       shiny::radioButtons(
