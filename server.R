@@ -219,7 +219,7 @@ panel_statistics <- function(data, global) {
   } else {
     trophy_correct <- 0L
   }
-  
+  #browser()
   if (trophy_correct == 0) {
     trophies <- "Keep going to get your first trophy!"
   } else {
@@ -228,7 +228,9 @@ panel_statistics <- function(data, global) {
       trophy_entered,
       trophy_levels[trophy_entered + 1])
     args <- lapply(seq_len(trophy_entered), function(e)
-      shiny::icon(paste("trophy", "fa-lg")))
+      shiny::span(
+        class = "trophy-1",
+        shiny::icon(paste("trophy", "fa-lg"))))
     args[[trophy_entered + 1]] <- s6
     s6_troph <- do.call(shiny::p, args)
     s7 <- sprintf(
@@ -236,7 +238,9 @@ panel_statistics <- function(data, global) {
       trophy_correct,
       trophy_levels[trophy_correct + 1])
     args <- lapply(seq_len(trophy_correct), function(e)
-      shiny::icon(paste("trophy", "fa-lg")))
+      shiny::span(
+        class = "trophy-2",
+        shiny::icon(paste("trophy", "fa-lg"))))
     args[[trophy_correct + 1]] <- s7
     s7_troph <- do.call(shiny::p, args)
     trophies <- lapply(list(s6_troph, s7_troph), shiny::p)
