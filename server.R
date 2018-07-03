@@ -387,7 +387,7 @@ shiny::shinyServer(
         shinyjs::disable("end")
         shiny::isolate({
           data <- values$data
-          output$typoapp <- shiny::renderUI(end_panel(data, data$global))
+          output$typoapp <- shiny::renderUI(end_panel(data, values$global))
           save_data(values, TRUE, PATH_OUTPUT)
         })
       })
