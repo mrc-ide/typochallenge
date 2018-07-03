@@ -149,8 +149,16 @@ end_panel <- function(id, data, global) {
   s1 <- "If you have changed your mind "
   s2 <- "and do not want us to store and use your data today, "
   s3 <- "please record the following identifier: '"
-  s4 <- "', and email it to us so we can discard your data."
-  withdrawal_txt <- paste0(s1, s2, s3, id, s4)
+  s4 <- "', and "
+  s5 <- shiny::a(href="mailto:a.cori@imperial.ac.uk&cc=Marc.Baguelin@phe.gov.uk", "email it to us")
+  s6 <- " so we can discard your data."
+  
+  withdrawal_txt <- shiny::tagList(
+    shiny::p(
+      s1, s2, s3, id, s4, s5, s6
+    )
+  )
+  
   shiny::sidebarLayout(
     shiny::sidebarPanel(
       shiny::div(
