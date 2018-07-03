@@ -1,7 +1,7 @@
 ## n_objective was chosen with the follwoing reasoning: 
 ## if there is 5% of errors, 
 ## 50000 * 5% = 2500 --> a good sample size to work with
-## assuming a lowe error rate of 1%, we would still get 
+## assuming a lower error rate of 1%, we would still get
 ## 50000 * 1% = 500 --> still ok sample size to work with
 
 plot_iframe <- function(n_target = c(5000, 10000, 20000, 50000), 
@@ -11,21 +11,21 @@ plot_iframe <- function(n_target = c(5000, 10000, 20000, 50000),
                         col2 = "#cc00cc") {
   d <- read_contributions()
   
-  tmp <- n_target - d$total_sum >0
+  tmp <- n_target - d$total_sum > 0
   if (any(tmp)) {
     my_target <- n_target[min(which(tmp))]
-  } else
-  {
-    my_target = max(n_target)
+  } else {
+    my_target <- max(n_target)
   }
   
   prop <- d$total_sum / my_target
-  if(prop > 1) { # could happen if we exceed the largest target
+  if (prop > 1) { # could happen if we exceed the largest target
     prop <- 1
   }
   
   png(filename = "iframe.png",
       width = 350, height = 400)
+  on.exit(dev.off())
   
   par(mar = c(5, 0, 6, 0))
   
@@ -58,6 +58,4 @@ plot_iframe <- function(n_target = c(5000, 10000, 20000, 50000),
   n_days_remain <- as.numeric(end_date - as.Date(Sys.time()))
   txt3 <- sprintf("(%d days remaining)", n_days_remain)
   mtext(txt3, side = 3, cex = 1.5)
-  
-  dev.off()
 }
