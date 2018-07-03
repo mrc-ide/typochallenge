@@ -12,11 +12,22 @@ cache <- new.env(parent = emptyenv())
 start_panel <- function() {
   shiny::tagList(
     shiny::includeHTML("overview.html"),
-    shiny::actionButton("survey", "Begin!",
+    shiny::actionButton("consent", "Begin!",
                         shiny::icon("play"), class = "btn-primary"),
     shiny::includeHTML("doc_sharing.html"))
 }
 
+consent_panel <- function() {
+  consent_msg <- shiny::strong("By ticking this box, you are agreeing for us to store and analyse your data, and to make this data publically available.")
+  shiny::tagList(
+    shiny::includeHTML("consent.html"),
+    shiny::checkboxInput("consent_tick", consent_msg, 
+                         value = FALSE, 
+                         width = '100%'),
+    shiny::actionButton("survey", "Next step",
+                        shiny::icon("play"), class = "btn-primary"),
+    shiny::includeHTML("doc_sharing.html"))
+}
 
 survey_panel <- function() {
   shiny::sidebarLayout(
@@ -358,6 +369,12 @@ shiny::shinyServer(
       date = NULL, prev = NULL, data = NULL, global = NULL)
     
     ## Here's the logic moving through the sections
+    shiny::observeEvent(
+      input$consent, {
+        shinyjs::disable("consent")
+        output$typoapp <- shiny::renderUI(consent_panel())
+      })
+    
     shiny::observeEvent(
       input$survey, {
         shinyjs::disable("survey")
