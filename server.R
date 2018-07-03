@@ -192,13 +192,17 @@ panel_statistics <- function(data, global) {
     n_correct <- data$n_correct
     if (is.null(data$time_best)) {
       body_stats <- sprintf(
+        
+        
+        
+        
         "You have not recorded any correct dates (out of %d %s)",
         n_entered, ngettext(n_entered, "try", "tries"))
     } else {
       s1 <- sprintf(
-        "You have recorded %d correct %s (out of %d %s).\n",
-        n_correct, ngettext(n_correct, "date", "dates"),
-        n_entered, ngettext(n_entered, "try", "tries"))
+        "Total number of entries: %s %s, %s correct %s.\n",
+        n_entered, ngettext(n_entered, "date", "dates"),
+        n_correct, ngettext(n_correct, "entry", "entries."))
       s2 <- sprintf(
         "Speed (per correct entry): fastest %ss, average %ss.\n",
         round(data$time_best, 2),
