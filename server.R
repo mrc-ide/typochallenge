@@ -352,7 +352,6 @@ shiny::shinyServer(
                                        values$timestamp)
           values$data <- update_data(values$prev, values$data)
           values$date <- new_date()
-          shinyjs::enable("challenge_submit")
         })
       })
 
@@ -371,6 +370,7 @@ shiny::shinyServer(
         shiny::updateTextInput(session, "challenge_date", value = "")
         output$date_image <- shiny::renderPlot(
           plot_date(date), width = date$width, height = date$height)
+        shinyjs::enable("challenge_submit")
         values$timestamp <- Sys.time()
       }
     })
