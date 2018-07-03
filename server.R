@@ -96,15 +96,15 @@ survey_panel <- function() {
       shiny::selectInput("survey_keyboard_input",
                          "Do you use the numeric keypad or the row of numbers to enter numbers (see image on right panel)",
                          choices = c("", 
-                                     list("Top row (blue keys, top of keyboard)",
-                                          "Numeric keypad (purple keys, right of keyboard)",
+                                     list("Numeric keypad (purple keys, right of keyboard)",
+                                          "Top row (blue keys, top of keyboard)",
                                           "A bit of both")),
                          selectize = TRUE),
       
       shiny::hr(),
       shiny::actionButton("instructions", "To the typos!", class = "btn-primary")),
     shiny::mainPanel(
-      shiny::img(src = "layouts.png")))
+      shiny::img(src = "layouts_cropped.pdf")))
 }
 
 instructions_panel <- function() {
