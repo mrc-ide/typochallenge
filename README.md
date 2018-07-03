@@ -1,4 +1,4 @@
-## TypoChallenge
+## typochallenge
 
 ### Requirements:
 
