@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 source("functions.R")
 
-## n_objective was chosen with the follwoing reasoning: 
+## n_objective was chosen with the following reasoning:
 ## if there is 5% of errors, 
 ## 50000 * 5% = 2500 --> a good sample size to work with
 ## assuming a lower error rate of 1%, we would still get
