@@ -354,7 +354,7 @@ panel_statistics <- function(data, global) {
     all_time_stats <- "You are the first to take the challenge!"
   } else {
     s3_bold <- "Number of entries: "
-    s3 <- "total (average per contributor)"
+    s3 <- "total (average / best per contributor)"
     s4_bold <- "Speed (per correct entry): "
     s4 <- sprintf(
       "fastest %ss, average %ss.\n",
@@ -368,9 +368,10 @@ panel_statistics <- function(data, global) {
         shiny::icon(paste("cogs", "fa-lg"))), 
       shiny::strong("All: "), 
       sprintf(
-        "%s (%s)",
+        "%s (%s / %s)",
         round(global$total_sum, 2), 
-        round(global$total_mean, 2)))
+        round(global$total_mean, 2),
+        round(global$total_max, 2)))
     all_time_1 <- do.call(shiny::p, args)
     args <- list(
       shiny::span(
@@ -378,9 +379,10 @@ panel_statistics <- function(data, global) {
         shiny::icon(paste("cogs", "fa-lg"))), 
       shiny::strong("Correct: "), 
       sprintf(
-        "%s (%s)",
+        "%s (%s / %s)",
         round(global$correct_sum, 2),
-        round(global$correct_mean, 2)))
+        round(global$correct_mean, 2),
+        round(global$correct_max, 2)))
     all_time_2 <- do.call(shiny::p, args)
     args <- list(
       shiny::span(
@@ -388,9 +390,10 @@ panel_statistics <- function(data, global) {
         shiny::icon(paste("cogs", "fa-lg"))), 
       shiny::strong("Correct in <5s: "), 
       sprintf(
-        "%s (%s)",
+        "%s (%s / %s)",
         round(global$correct_less_5s_sum, 2),
-        round(global$correct_less_5s_mean, 2))
+        round(global$correct_less_5s_mean, 2),
+        round(global$correct_less_5s_max, 2))
       
     )
     all_time_3 <- do.call(shiny::p, args)

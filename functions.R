@@ -29,8 +29,10 @@ read_contributions <- function(path_output = "contributions", cache = NULL) {
     }
     list(total_sum = as.integer(sum(s[, "total"])),
          total_mean = mean(s[, "total"]),
+         total_max = max(s[, "total"]),
          correct_sum = as.integer(sum(s[, "correct"])),
          correct_mean = mean(s[, "correct"]),
+         correct_max = as.integer(max(s[, "correct"])),
          best_total = as.integer(max(s[, "total"])),
          best_correct = as.integer(max(s[, "correct"])),
          best_best = min(s[, "best"], na.rm = TRUE),
@@ -39,6 +41,7 @@ read_contributions <- function(path_output = "contributions", cache = NULL) {
          mean_mean = mean(s[, "mean"], na.rm = TRUE),
          correct_less_5s_sum = as.integer(sum(s[, "correct_less_5s"])),
          correct_less_5s_mean = mean(s[, "correct_less_5s"]),
+         correct_less_5s_max = max(s[, "correct_less_5s"]),
          n_contributions = length(unique(s[, "id_parent"])))
   } else {
     NULL
