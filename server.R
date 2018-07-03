@@ -119,11 +119,14 @@ challenge_panel <- function() {
 
 
 end_panel <- function(data, global) {
+  statistics <- panel_statistics(data, global)
   shiny::sidebarLayout(
     shiny::sidebarPanel(
       shiny::div(
         class = "panel-group",
-        panel_statistics(data, global)),
+        statistics$trophies,
+        statistics$user,
+        statistics$global),
       shiny::actionButton("continue", "Continue?",
                           shiny::icon("play"),
                           class = "btn-success",
@@ -173,16 +176,28 @@ render_prev <- function(prev, data, global) {
       type <- "danger"
       icon <- "times"
     }
-    
-    shiny::div(
-      class = "panel-group",
-      shiny::div(
-        class = sprintf("panel panel-%s", type),
-        shiny::div(class = "panel-heading",
-                   shiny::icon(paste(icon, "fa-lg")),
-                   title),
-        shiny::div(class = "panel-body", body_feedback)),
-      panel_statistics(data, global))
+
+    statistics <- panel_statistics(data, global)
+    feedback <- shiny::div(
+      class = sprintf("panel panel-%s", type),
+      shiny::div(class = "panel-heading",
+                 shiny::icon(paste(icon, "fa-lg")),
+                 title),
+      shiny::div(class = "panel-body", body_feedback))
+
+    shiny::fluidRow(
+      shiny::column(6,
+                    shiny::div(
+                      class = "panel-group",
+                      shiny::div(
+                        feedback,
+                        statistics$trophies))),
+      shiny::column(6,
+                    shiny::div(
+                      class = "panel-group",
+                      shiny::div(
+                        statistics$user,
+                        statistics$global))))
   }
 }
 
@@ -256,26 +271,27 @@ panel_statistics <- function(data, global) {
       round(global$best_mean, 2), round(global$mean_mean, 2))
     all_time_stats <- lapply(list(s3, s4, s5), shiny::p)
   }
-  
-  shiny::tagList(
-    shiny::div(
-      class = "panel panel-info",
-      shiny::div(class = "panel-heading",
-                 shiny::icon(paste("cog", "fa-lg")),
-                 "Your statistics"),
-      shiny::div(class = "panel-body", body_stats)),
-    shiny::div(
-      class = "panel panel-info",
-      shiny::div(class = "panel-heading",
-                 shiny::icon(paste("trophy", "fa-lg")),
-                 "Your achievements"),
-      shiny::div(class = "panel-body", trophies)),
-    shiny::div(
-      class = "panel panel-info",
-      shiny::div(class = "panel-heading",
-                 shiny::icon(paste("cogs", "fa-lg")),
-                 "All time statistics (excluding this session)"),
-      shiny::div(class = "panel-body", all_time_stats)))
+
+  list(user = shiny::div(
+         class = "panel panel-info",
+         shiny::div(class = "panel-heading",
+                    shiny::icon(paste("cog", "fa-lg")),
+                    "Your statistics"),
+         shiny::div(class = "panel-body", body_stats)),
+
+       global = shiny::div(
+         class = "panel panel-info",
+         shiny::div(class = "panel-heading",
+                    shiny::icon(paste("cogs", "fa-lg")),
+                    "All time statistics (excluding this session)"),
+         shiny::div(class = "panel-body", all_time_stats)),
+
+       trophies = shiny::div(
+         class = "panel panel-info",
+         shiny::div(class = "panel-heading",
+                    shiny::icon(paste("trophy", "fa-lg")),
+                    "Your achievements"),
+         shiny::div(class = "panel-body", trophies)))
 }
 
 
