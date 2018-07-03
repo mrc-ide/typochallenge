@@ -13,15 +13,23 @@ plot_iframe <- function(n_target = c(5000, 10000, 20000, 50000),
                         col = "#660066",
                         col2 = "#cc00cc") {
   d <- read_contributions()
-  
-  tmp <- n_target - d$total_sum > 0
+
+  if (is.null(d)) {
+    n_total <- 0L
+    n_contributions <- 0L
+  } else {
+    n_total <- d$total_sum
+    n_contributions <- d$n_contributions
+  }
+
+  tmp <- n_target - n_total > 0
   if (any(tmp)) {
     my_target <- n_target[min(which(tmp))]
   } else {
     my_target <- max(n_target)
   }
   
-  prop <- d$total_sum / my_target
+  prop <- n_total / my_target
   if (prop > 1) { # could happen if we exceed the largest target
     prop <- 1
   }
@@ -44,11 +52,11 @@ plot_iframe <- function(n_target = c(5000, 10000, 20000, 50000),
           col = col2)
   
   ## add text at bottom
-  txt <- sprintf("%d data entries", d$total_sum)
+  txt <- sprintf("%d data entries", n_total)
   mtext(txt, side = 1, cex = 2, col = col2)
   txt2 <- sprintf("of our %d target,", my_target)
   mtext(txt2, side = 1, line = 1.5, cex = 1.5)
-  txt3 <- sprintf("thanks to %d contributors", d$n_contributions)
+  txt3 <- sprintf("thanks to %d contributors", n_contributions)
   mtext(txt3, side = 1, line = 3, cex = 1.5)
   
   ## add text at top
