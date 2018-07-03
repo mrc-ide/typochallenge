@@ -64,7 +64,7 @@ plot_iframe <- function(n_target = c(5000, 10000, 20000, 50000),
   txt2 <- sprintf("%s to %s", 
                   format(start_date, "%d/%m/%y"), 
                   format(end_date, "%d/%m/%y"))
-  mtext(txt, side = 3, line = 3, cex = 2, col = col)
+  mtext(txt, side = 3, line = 3.5, cex = 2, col = col)
   mtext(txt2, side = 3, line = 1.5, cex = 2, col = col)
   n_days_remain <- as.numeric(end_date - as.Date(Sys.time()))
   txt3 <- sprintf("(%d days remaining)", n_days_remain)
