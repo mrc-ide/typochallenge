@@ -199,7 +199,7 @@ panel_statistics <- function(data, global) {
     s1 <- sprintf(
       "%s %s, %s correct %s.\n",
       n_entered, ngettext(n_entered, "date", "dates"),
-      n_correct, ngettext(n_correct, "entry", "entries."))
+      n_correct, ngettext(n_correct, "entry", "entries"))
     s2_bold <- "Speed (per correct entry): "
     s2 <- sprintf(
       "fastest %ss, average %ss.\n",
