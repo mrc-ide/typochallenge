@@ -43,8 +43,8 @@ survey_panel <- function() {
                          selectize = TRUE),
       
       shiny::selectInput("country_from", "Where are you from?", 
-                            choices = c("", 
-                                        COUNTRIES),
+                         choices = c("", 
+                                     COUNTRIES),
                          selectize = TRUE),
       
       shiny::selectInput("country_residence", "Where do you currently live?", 
@@ -188,75 +188,71 @@ render_prev <- function(prev, data, global) {
 
 
 panel_statistics <- function(data, global) {
-    n_entered <- length(data$rows)
-    n_correct <- data$n_correct
-    if (is.null(data$time_best)) {
-      body_stats <- sprintf(
-        
-        
-        
-        
-        "You have not recorded any correct dates (out of %d %s)",
-        n_entered, ngettext(n_entered, "try", "tries"))
-    } else {
-      s1 <- sprintf(
-        "Total number of entries: %s %s, %s correct %s.\n",
-        n_entered, ngettext(n_entered, "date", "dates"),
-        n_correct, ngettext(n_correct, "entry", "entries."))
-      s2 <- sprintf(
-        "Speed (per correct entry): fastest %ss, average %ss.\n",
-        round(data$time_best, 2),
-        round(data$time_total / n_correct, 2))
-      body_stats <- lapply(list(s1, s2), shiny::p)
-    }
-    
-    trophy_levels <- c(0,
-                       if (DEVEL_VERSION) 1, 2,
-                       5, 10, 50, 100, 500, 1000, 5000)
-    trophy_entered <- max(which(n_entered >= trophy_levels)) - 1L
-    if (any(n_correct >= trophy_levels)) {
-      trophy_correct <- max(which(n_correct >= trophy_levels)) - 1L
-    } else {
-      trophy_correct <- 0L
-    }
-    
-    if (trophy_correct == 0) {
-      trophies <- "Keep going to get your first trophy!"
-    } else {
-      s6 <- sprintf(
-        "Level %s: total number of entries > %s", 
-        trophy_entered,
-        trophy_levels[trophy_entered + 1])
-      args <- lapply(seq_len(trophy_entered), function(e)
-        shiny::icon(paste("trophy", "fa-lg")))
-      args[[trophy_entered + 1]] <- s6
-      s6_troph <- do.call(shiny::p, args)
-      s7 <- sprintf(
-        "Level %s: total number of correct entries > %s", 
-        trophy_correct,
-        trophy_levels[trophy_correct + 1])
-      args <- lapply(seq_len(trophy_correct), function(e)
-        shiny::icon(paste("trophy", "fa-lg")))
-      args[[trophy_correct + 1]] <- s7
-      s7_troph <- do.call(shiny::p, args)
-      trophies <- lapply(list(s6_troph, s7_troph), shiny::p)
-    }
-
-    if (is.null(global)) {
-      all_time_stats <- "You are the first to take the challenge!"
-    } else {
-      s3 <- sprintf(
-        "Total number of entries: %s dates, %s correct entries.",
-        round(global$total_sum, 2), round(global$correct_sum, 2))
-      s4 <- sprintf(
-        "Average number of entries per contributor: %s dates, %s correct entries.",
-        round(global$total_mean, 2), round(global$correct_mean, 2))
-      s5 <- sprintf(
-        "Speed (per correct entry): fastest %ss, average %ss.",
-        round(global$best_mean, 2), round(global$mean_mean, 2))
-      all_time_stats <- lapply(list(s3, s4, s5), shiny::p)
-    }
-
+  n_entered <- length(data$rows)
+  n_correct <- data$n_correct
+  if (is.null(data$time_best)) {
+    body_stats <- sprintf(
+      "You have not recorded any correct dates (out of %d %s)",
+      n_entered, ngettext(n_entered, "try", "tries"))
+  } else {
+    s1 <- sprintf(
+      "Total number of entries: %s %s, %s correct %s.\n",
+      n_entered, ngettext(n_entered, "date", "dates"),
+      n_correct, ngettext(n_correct, "entry", "entries."))
+    s2 <- sprintf(
+      "Speed (per correct entry): fastest %ss, average %ss.\n",
+      round(data$time_best, 2),
+      round(data$time_total / n_correct, 2))
+    body_stats <- lapply(list(s1, s2), shiny::p)
+  }
+  
+  trophy_levels <- c(0,
+                     if (DEVEL_VERSION) 1, 2,
+                     5, 10, 50, 100, 500, 1000, 5000)
+  trophy_entered <- max(which(n_entered >= trophy_levels)) - 1L
+  if (any(n_correct >= trophy_levels)) {
+    trophy_correct <- max(which(n_correct >= trophy_levels)) - 1L
+  } else {
+    trophy_correct <- 0L
+  }
+  
+  if (trophy_correct == 0) {
+    trophies <- "Keep going to get your first trophy!"
+  } else {
+    s6 <- sprintf(
+      "Level %s: total number of entries > %s", 
+      trophy_entered,
+      trophy_levels[trophy_entered + 1])
+    args <- lapply(seq_len(trophy_entered), function(e)
+      shiny::icon(paste("trophy", "fa-lg")))
+    args[[trophy_entered + 1]] <- s6
+    s6_troph <- do.call(shiny::p, args)
+    s7 <- sprintf(
+      "Level %s: total number of correct entries > %s", 
+      trophy_correct,
+      trophy_levels[trophy_correct + 1])
+    args <- lapply(seq_len(trophy_correct), function(e)
+      shiny::icon(paste("trophy", "fa-lg")))
+    args[[trophy_correct + 1]] <- s7
+    s7_troph <- do.call(shiny::p, args)
+    trophies <- lapply(list(s6_troph, s7_troph), shiny::p)
+  }
+  
+  if (is.null(global)) {
+    all_time_stats <- "You are the first to take the challenge!"
+  } else {
+    s3 <- sprintf(
+      "Total number of entries: %s dates, %s correct entries.",
+      round(global$total_sum, 2), round(global$correct_sum, 2))
+    s4 <- sprintf(
+      "Average number of entries per contributor: %s dates, %s correct entries.",
+      round(global$total_mean, 2), round(global$correct_mean, 2))
+    s5 <- sprintf(
+      "Speed (per correct entry): fastest %ss, average %ss.",
+      round(global$best_mean, 2), round(global$mean_mean, 2))
+    all_time_stats <- lapply(list(s3, s4, s5), shiny::p)
+  }
+  
   shiny::tagList(
     shiny::div(
       class = "panel panel-info",
@@ -358,7 +354,7 @@ shiny::shinyServer(
           values$date <- new_date()
         })
       })
-
+    
     if (DEVEL_VERSION) {
       shiny::observeEvent(
         input$devel_correct_date, {
@@ -400,7 +396,7 @@ shiny::shinyServer(
       input$new_user, {
         output$typoapp <- shiny::renderUI(start_panel())
       })
-
+    
     shiny::observeEvent(
       input$retry, {
         last <- values$last
@@ -410,14 +406,14 @@ shiny::shinyServer(
         output$typoapp <- shiny::renderUI(challenge_panel())
         values$date <- new_date()
       })
-
+    
     shiny::observeEvent(
       input$continue, {
         restore_data(values)
         output$typoapp <- shiny::renderUI(challenge_panel())
         values$date <- new_date()
       })
-
+    
     output$typoapp <- shiny::renderUI(start_panel())
     
     session$onSessionEnded(function() {
