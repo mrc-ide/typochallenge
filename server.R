@@ -245,14 +245,42 @@ panel_statistics <- function(data, global) {
       n_entered, ngettext(n_entered, "date", "dates"),
       n_correct, ngettext(n_correct, "entry", "entries"), 
       n_correct_fast, ngettext(n_correct_fast, "entry", "entries"))
+    s1_1 <- sprintf(
+      "%s %s",
+      n_entered, ngettext(n_entered, "date", "dates"))
+    s1_2 <- sprintf(
+      "%s correct %s",
+      n_correct, ngettext(n_correct, "entry", "entries"))
+    s1_3 <- sprintf(
+      "%s correct %s in <5s.",
+      n_correct_fast, ngettext(n_correct_fast, "entry", "entries"))
     s2_bold <- "Speed (per correct entry): "
     s2 <- sprintf(
       "fastest %ss, average %ss.\n",
       round(data$time_best, 2),
       round(data$time_total / n_correct, 2))
     body_bold <- lapply(list(s1_bold, s2_bold), shiny::strong)
-    body <- lapply(list(s1, s2), shiny::p)
-    body_stats <- list(body_bold[[1]], body[[1]], body_bold[[2]], body[[2]])
+    args <- list(
+      shiny::span(
+        class = "trophy-1",
+        shiny::icon(paste("cog", "fa-lg"))), 
+      s1_1)
+    body_1 <- do.call(shiny::p, args)
+    args <- list(
+      shiny::span(
+        class = "trophy-2",
+        shiny::icon(paste("cog", "fa-lg"))), 
+      s1_2)
+    body_2 <- do.call(shiny::p, args)
+    args <- list(
+      shiny::span(
+        class = "trophy-3",
+        shiny::icon(paste("cog", "fa-lg"))), 
+      s1_3)
+    body_3 <- do.call(shiny::p, args)
+    
+    body_stats <- list(body_bold[[1]], body_1, body_2, body_3, 
+                       body_bold[[2]], shiny::p(s2))
   }
   
   trophy_levels <- c(0,
