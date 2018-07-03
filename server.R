@@ -205,7 +205,7 @@ panel_statistics <- function(data, global) {
       "fastest %ss, average %ss.\n",
       round(data$time_best, 2),
       round(data$time_total / n_correct, 2))
-    body_bold <- lapply(list(s1_bold, s2_bold), tags$b)
+    body_bold <- lapply(list(s1_bold, s2_bold), shiny::strong)
     body <- lapply(list(s1, s2), shiny::p)
     body_stats <- list(body_bold[[1]], body[[1]], body_bold[[2]], body[[2]])
   }
