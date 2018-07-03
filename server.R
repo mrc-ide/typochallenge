@@ -266,7 +266,7 @@ panel_statistics <- function(data, global) {
   } else {
     s3_bold <- "Number of entries: "
     s3 <- sprintf(
-      "Total: %s %s, %s correct %s;",
+      "Total: %s %s, %s correct %s.",
       round(global$total_sum, 2), 
       ngettext(round(global$total_sum, 2), "date", "dates"),
       round(global$correct_sum, 2), 
@@ -283,10 +283,16 @@ panel_statistics <- function(data, global) {
       round(global$best_mean, 2), 
       round(global$mean_mean, 2))
     all_time_bold <- lapply(list(s3_bold, s5_bold), shiny::strong)
-    
-    all_time <- lapply(list(s3, s4, s5), shiny::p)
-    all_time_stats <- list(all_time_bold[[1]], all_time[[1]], all_time[[2]],
-                           all_time_bold[[2]], all_time[[3]])
+
+    all_time_stats <- shiny::tagList(
+      shiny::p(
+        shiny::strong(s3_bold),
+        shiny::br(),
+        s3, shiny::br(), s4),
+      shiny::p(
+        shiny::strong(s5_bold),
+        shiny::br(),
+        s5))
   }
 
   list(user = shiny::div(
