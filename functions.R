@@ -21,6 +21,7 @@ read_contributions <- function(path_output = "contributions", cache = NULL) {
     s[, "correct"] <- as.numeric(as.character(s[, "correct"]))
     s[, "best"] <- as.numeric(as.character(s[, "best"]))
     s[, "mean"] <- as.numeric(as.character(s[, "mean"]))
+    s[, "correct_less_5s"] <- as.numeric(as.character(s[, "correct_less_5s"]))
     
     if (all(is.na(s[, "best"]))) {
       ## Still just testing here.
@@ -36,6 +37,8 @@ read_contributions <- function(path_output = "contributions", cache = NULL) {
          best_mean = mean(s[, "best"], na.rm = TRUE),
          best_mean = min(s[, "mean"], na.rm = TRUE),
          mean_mean = mean(s[, "mean"], na.rm = TRUE),
+         correct_less_5s_sum = as.integer(sum(s[, "correct_less_5s"])),
+         correct_less_5s_mean = mean(s[, "correct_less_5s"]),
          n_contributions = length(unique(s[, "id_parent"])))
   } else {
     NULL
@@ -56,7 +59,8 @@ read_contribution <- function(p, path_output = "contributions", cache = NULL) {
              total = length(i),
              correct = sum(i),
              best = if (any(i)) min(t) else NA_real_,
-             mean = if (any(i)) mean(t) else NA_real_)
+             mean = if (any(i)) mean(t) else NA_real_,
+             correct_less_5s = if (any(i)) sum(d$data$elapsed[i] < 5) else 0)
   } else {
     ret <- NULL
   }
