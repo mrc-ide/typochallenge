@@ -297,42 +297,57 @@ panel_statistics <- function(data, global) {
   if (trophy_correct == 0) {
     trophies <- "Keep going to get your first trophy!"
   } else {
-    s6 <- sprintf(
-      "Level %s: number of entries: %s+", 
-      trophy_entered,
-      trophy_levels[trophy_entered + 1])
-    args <- lapply(seq_len(trophy_entered), function(e)
+    s6 <- shiny::strong("All: ")
+    args <- list()
+    args[[1]] <- s6
+    args2 <- lapply(seq_len(trophy_entered), function(e)
       shiny::span(
         class = "trophy-1",
         shiny::icon(paste("trophy", "fa-lg"))))
-    args[[trophy_entered + 1]] <- s6
+    args[seq(2, length(args2) + 1)] <- args2
     s6_troph <- do.call(shiny::p, args)
-    s7 <- sprintf(
-      "Level %s: number of correct entries: %s+", 
-      trophy_correct,
-      trophy_levels[trophy_correct + 1])
-    args <- lapply(seq_len(trophy_correct), function(e)
+    
+    s7 <- shiny::strong("Correct: ")
+    args <- list()
+    args[[1]] <- s7
+    args2 <- lapply(seq_len(trophy_correct), function(e)
       shiny::span(
         class = "trophy-2",
         shiny::icon(paste("trophy", "fa-lg"))))
-    args[[trophy_correct + 1]] <- s7
+    args[seq(2, length(args2) + 1)] <- args2
     s7_troph <- do.call(shiny::p, args)
     
     if (trophy_correct_fast > 0) {
-      s8 <- sprintf(
-        "Level %s: number of correct entries in <5s: %s+", 
-        trophy_correct_fast,
-        trophy_levels[trophy_correct_fast + 1])
-      args <- lapply(seq_len(trophy_correct_fast), function(e)
+      s8 <- shiny::strong("Correct in <5s: ")
+      args <- list()
+      args[[1]] <- s8
+      args2 <- lapply(seq_len(trophy_correct_fast), function(e)
         shiny::span(
           class = "trophy-3",
           shiny::icon(paste("trophy", "fa-lg"))))
-      args[[trophy_correct + 1]] <- s8
+      args[seq(2, length(args2) + 1)] <- args2
       s8_troph <- do.call(shiny::p, args)
       trophies <- lapply(list(s6_troph, s7_troph, s8_troph), shiny::p)
     } else {
-    trophies <- lapply(list(s6_troph, s7_troph), shiny::p)
+      trophies <- lapply(list(s6_troph, s7_troph), shiny::p)
     }
+    
+    ### Adding legend ###
+    trophies[[length(trophies) + 1]] <- shiny::strong("Levels:")
+    for(i in seq_len(length(trophy_levels)-1)) {
+      leg1 <- sprintf("%s x ", i)
+      leg2 <- sprintf(" = %s+ entries", trophy_levels[i+1])
+      args <- list()
+      args[[1]] <- leg1
+      args[[2]]  <- shiny::span(
+        class = "trophy-legend",
+        shiny::icon(paste("trophy", "fa-lg"))) 
+      args[[3]] <- leg2
+      legend <- do.call(shiny::p, args)
+      
+      trophies[[length(trophies) + 1]] <- legend
+    }
+    
   }
   
   if (is.null(global)) {
