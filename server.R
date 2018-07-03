@@ -195,7 +195,7 @@ panel_statistics <- function(data, global) {
       "You have not recorded any correct dates (out of %d %s)",
       n_entered, ngettext(n_entered, "try", "tries"))
   } else {
-    s1_bold <- "Total number of entries: "
+    s1_bold <- "Number of entries: "
     s1 <- sprintf(
       "%s %s, %s correct %s.\n",
       n_entered, ngettext(n_entered, "date", "dates"),
@@ -224,7 +224,7 @@ panel_statistics <- function(data, global) {
     trophies <- "Keep going to get your first trophy!"
   } else {
     s6 <- sprintf(
-      "Level %s: total number of entries > %s", 
+      "Level %s: number of entries > %s", 
       trophy_entered,
       trophy_levels[trophy_entered + 1])
     args <- lapply(seq_len(trophy_entered), function(e)
@@ -234,7 +234,7 @@ panel_statistics <- function(data, global) {
     args[[trophy_entered + 1]] <- s6
     s6_troph <- do.call(shiny::p, args)
     s7 <- sprintf(
-      "Level %s: total number of correct entries > %s", 
+      "Level %s: number of correct entries > %s", 
       trophy_correct,
       trophy_levels[trophy_correct + 1])
     args <- lapply(seq_len(trophy_correct), function(e)
@@ -249,16 +249,29 @@ panel_statistics <- function(data, global) {
   if (is.null(global)) {
     all_time_stats <- "You are the first to take the challenge!"
   } else {
+    s3_bold <- "Number of entries: "
     s3 <- sprintf(
-      "Total number of entries: %s dates, %s correct entries.",
-      round(global$total_sum, 2), round(global$correct_sum, 2))
+      "Total: %s %s, %s correct %s;",
+      round(global$total_sum, 2), 
+      ngettext(round(global$total_sum, 2), "date", "dates"),
+      round(global$correct_sum, 2), 
+      ngettext(round(global$correct_sum, 2), "entry", "entries"))
     s4 <- sprintf(
-      "Average number of entries per contributor: %s dates, %s correct entries.",
-      round(global$total_mean, 2), round(global$correct_mean, 2))
+      "Mean per contributor: %s %s, %s correct %s.",
+      round(global$total_mean, 2), 
+      ngettext(round(global$total_mean, 2), "date", "dates"),
+      round(global$correct_mean, 2), 
+      ngettext(round(global$correct_mean, 2), "entry", "entries"))
+    s5_bold <- "Speed (per correct entry): "
     s5 <- sprintf(
-      "Speed (per correct entry): fastest %ss, average %ss.",
-      round(global$best_mean, 2), round(global$mean_mean, 2))
-    all_time_stats <- lapply(list(s3, s4, s5), shiny::p)
+      "fastest %ss, average %ss.\n",
+      round(global$best_mean, 2), 
+      round(global$mean_mean, 2))
+    all_time_bold <- lapply(list(s3_bold, s5_bold), shiny::strong)
+    
+    all_time <- lapply(list(s3, s4, s5), shiny::p)
+    all_time_stats <- list(all_time_bold[[1]], all_time[[1]], all_time[[2]],
+                           all_time_bold[[2]], all_time[[3]])
   }
   
   shiny::tagList(
