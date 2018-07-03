@@ -143,10 +143,9 @@ challenge_panel <- function() {
 }
 
 
-end_panel <- function(data, global) {
+end_panel <- function(id, data, global) {
   statistics <- panel_statistics(data, global)
   withdrawal_title <- "Important information about the data you shared today"
-  id <- "placeholder_id" # TO DO: change this
   s1 <- "If you have changed your mind "
   s2 <- "and do not want us to store and use your data today, "
   s3 <- "please record the following identifier: '"
@@ -575,7 +574,8 @@ shiny::shinyServer(
         shinyjs::disable("end")
         shiny::isolate({
           data <- values$data
-          output$typoapp <- shiny::renderUI(end_panel(data, values$global))
+          id <- values$id
+          output$typoapp <- shiny::renderUI(end_panel(id, data, values$global))
           save_data(values, TRUE, PATH_OUTPUT)
         })
       })
@@ -610,7 +610,8 @@ shiny::shinyServer(
           message(sprintf("Detected session closed for '%s'", values$id))
           shiny::isolate({
             data <- values$data
-            output$typoapp <- shiny::renderUI(end_panel(data, data$global))
+            id <- values$id
+            output$typoapp <- shiny::renderUI(end_panel(id, data, data$global))
             save_data(values, TRUE, PATH_OUTPUT)
           })
         }
