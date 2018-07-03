@@ -150,7 +150,10 @@ end_panel <- function(id, data, global) {
   s2 <- "and do not want us to store and use your data today, "
   s3 <- "please record the following identifier: '"
   s4 <- "', and "
-  s5 <- shiny::a(href="mailto:a.cori@imperial.ac.uk&cc=Marc.Baguelin@phe.gov.uk", "email it to us")
+  mailto <- "mailto:a.cori@imperial.ac.uk;Marc.Baguelin@phe.gov.uk"
+  subject <- "?subject=Withdrawal%20from%20typo%20challenge"
+  body <- "&body=Please%20remove%20my%20data.%20My%20ID%20is:%20"
+  s5 <- shiny::a(href=paste0(mailto, subject, body, id), "email it to us")
   s6 <- " so we can discard your data."
   
   withdrawal_txt <- shiny::tagList(
