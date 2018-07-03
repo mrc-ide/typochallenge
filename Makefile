@@ -9,7 +9,10 @@ bootstrap:
 countries.txt:
 	Rscript -e "writeLines(trimws(sort(rworldmap::countryExData[ , 2])), '$@')"
 
+iframe.png:
+	Rscript "iframe.R"
+
 build_cache:
 	Rscript build_cache
 
-.PHONY: bootstrap build_cache
+.PHONY: bootstrap build_cache iframe.png

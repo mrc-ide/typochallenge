@@ -1,3 +1,6 @@
+#!/usr/bin/env Rscript
+source("functions.R")
+
 ## n_objective was chosen with the follwoing reasoning: 
 ## if there is 5% of errors, 
 ## 50000 * 5% = 2500 --> a good sample size to work with
@@ -58,4 +61,8 @@ plot_iframe <- function(n_target = c(5000, 10000, 20000, 50000),
   n_days_remain <- as.numeric(end_date - as.Date(Sys.time()))
   txt3 <- sprintf("(%d days remaining)", n_days_remain)
   mtext(txt3, side = 3, cex = 1.5)
+}
+
+if (!interactive()) {
+  plot_iframe()
 }
