@@ -264,12 +264,17 @@ panel_statistics <- function(data, global) {
   } else {
     trophy_correct <- 0L
   }
+  if (any(n_correct_fast >= trophy_levels)) {
+    trophy_correct_fast <- max(which(n_correct_fast >= trophy_levels)) - 1L
+  } else {
+    trophy_correct_fast <- 0L
+  }
   #browser()
   if (trophy_correct == 0) {
     trophies <- "Keep going to get your first trophy!"
   } else {
     s6 <- sprintf(
-      "Level %s: number of entries > %s", 
+      "Level %s: number of entries: %s+", 
       trophy_entered,
       trophy_levels[trophy_entered + 1])
     args <- lapply(seq_len(trophy_entered), function(e)
@@ -279,7 +284,7 @@ panel_statistics <- function(data, global) {
     args[[trophy_entered + 1]] <- s6
     s6_troph <- do.call(shiny::p, args)
     s7 <- sprintf(
-      "Level %s: number of correct entries > %s", 
+      "Level %s: number of correct entries: %s+", 
       trophy_correct,
       trophy_levels[trophy_correct + 1])
     args <- lapply(seq_len(trophy_correct), function(e)
@@ -288,7 +293,22 @@ panel_statistics <- function(data, global) {
         shiny::icon(paste("trophy", "fa-lg"))))
     args[[trophy_correct + 1]] <- s7
     s7_troph <- do.call(shiny::p, args)
+    
+    if (trophy_correct_fast > 0) {
+      s8 <- sprintf(
+        "Level %s: number of correct entries in <5s: %s+", 
+        trophy_correct_fast,
+        trophy_levels[trophy_correct_fast + 1])
+      args <- lapply(seq_len(trophy_correct_fast), function(e)
+        shiny::span(
+          class = "trophy-3",
+          shiny::icon(paste("trophy", "fa-lg"))))
+      args[[trophy_correct + 1]] <- s8
+      s8_troph <- do.call(shiny::p, args)
+      trophies <- lapply(list(s6_troph, s7_troph, s8_troph), shiny::p)
+    } else {
     trophies <- lapply(list(s6_troph, s7_troph), shiny::p)
+    }
   }
   
   if (is.null(global)) {
