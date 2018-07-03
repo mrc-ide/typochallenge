@@ -60,7 +60,7 @@ read_contribution <- function(p, path_output = "contributions", cache = NULL) {
              correct = sum(i),
              best = if (any(i)) min(t) else NA_real_,
              mean = if (any(i)) mean(t) else NA_real_,
-             correct_less_5s = if (any(i)) sum(d$data$elapsed[i] < 5) else 0)
+             correct_less_5s = if (any(i)) sum(d$data$elapsed[i] < 5) else 0L)
   } else {
     ret <- NULL
   }

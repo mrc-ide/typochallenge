@@ -233,6 +233,7 @@ render_prev <- function(prev, data, global) {
 panel_statistics <- function(data, global) {
   n_entered <- length(data$rows)
   n_correct <- data$n_correct
+  n_correct_fast <- data$n_correct_fast
   if (is.null(data$time_best)) {
     body_stats <- sprintf(
       "You have not recorded any correct dates (out of %d %s)",
@@ -240,9 +241,10 @@ panel_statistics <- function(data, global) {
   } else {
     s1_bold <- "Number of entries: "
     s1 <- sprintf(
-      "%s %s, %s correct %s.\n",
+      "%s %s, %s correct %s, %s correct %s in <5s.\n",
       n_entered, ngettext(n_entered, "date", "dates"),
-      n_correct, ngettext(n_correct, "entry", "entries"))
+      n_correct, ngettext(n_correct, "entry", "entries"), 
+      n_correct_fast, ngettext(n_correct_fast, "entry", "entries"))
     s2_bold <- "Speed (per correct entry): "
     s2 <- sprintf(
       "fastest %ss, average %ss.\n",
@@ -294,17 +296,21 @@ panel_statistics <- function(data, global) {
   } else {
     s3_bold <- "Number of entries: "
     s3 <- sprintf(
-      "Total: %s %s, %s correct %s.",
+      "Total: %s %s, %s correct %s, %s correct %s in <5s.",
       round(global$total_sum, 2), 
       ngettext(round(global$total_sum, 2), "date", "dates"),
       round(global$correct_sum, 2), 
-      ngettext(round(global$correct_sum, 2), "entry", "entries"))
+      ngettext(round(global$correct_sum, 2), "entry", "entries"),
+      round(global$correct_less_5s_sum, 2), 
+      ngettext(round(global$correct_less_5s_sum, 2), "entry", "entries"))
     s4 <- sprintf(
-      "Mean per contributor: %s %s, %s correct %s.",
+      "Mean per contributor: %s %s, %s correct %s, %s correct %s in <5s.",
       round(global$total_mean, 2), 
       ngettext(round(global$total_mean, 2), "date", "dates"),
       round(global$correct_mean, 2), 
-      ngettext(round(global$correct_mean, 2), "entry", "entries"))
+      ngettext(round(global$correct_mean, 2), "entry", "entries"),
+      round(global$correct_less_5s_mean, 2), 
+      ngettext(round(global$correct_less_5s_mean, 2), "entry", "entries"))
     s5_bold <- "Speed (per correct entry): "
     s5 <- sprintf(
       "fastest %ss, average %ss.\n",
@@ -352,13 +358,14 @@ update_data <- function(prev, data) {
       data$time_best <- prev$elapsed
       data$time_total <- prev$elapsed
       data$n_correct <- 1L
+      data$n_correct_fast <- ifelse(prev$elapsed < 5, 1L, 0L)
     } else {
       data$time_best <- min(prev$elapsed, data$time_best)
       data$time_total <- prev$elapsed + data$time_total
       data$n_correct <- data$n_correct + 1L
+      if(prev$elapsed < 5) data$n_correct_fast <- data$n_correct_fast + 1L
     }
   }
-  
   prev$date <- format(prev$date, "%d/%m/%Y")
   data$rows <- c(data$rows, list(prev[names(data_cols)]))
   data
