@@ -17,6 +17,23 @@ start_panel <- function() {
     shiny::includeHTML("doc_sharing.html"))
 }
 
+dataModal <- function(failed = FALSE) {
+  modalDialog(
+    textInput("dataset", "Choose data set",
+              placeholder = 'Try "mtcars" or "abc"'
+    ),
+    span('(Try the name of a valid data object like "mtcars", ',
+         'then a name of a non-existent object like "abc")'),
+    if (failed)
+      div(tags$b("Invalid name of data object", style = "color: red;")),
+    
+    footer = tagList(
+      modalButton("Cancel"),
+      actionButton("ok", "OK")
+    )
+  )
+}
+
 consent_panel <- function() {
   consent_msg <- shiny::strong("By ticking this box, you are agreeing for us to store and analyse your data, and to make this data publically available.")
   shiny::tagList(
@@ -187,7 +204,7 @@ render_prev <- function(prev, data, global) {
       type <- "danger"
       icon <- "times"
     }
-
+    
     statistics <- panel_statistics(data, global)
     feedback <- shiny::div(
       class = sprintf("panel panel-%s", type),
@@ -195,7 +212,7 @@ render_prev <- function(prev, data, global) {
                  shiny::icon(paste(icon, "fa-lg")),
                  title),
       shiny::div(class = "panel-body", body_feedback))
-
+    
     shiny::fluidRow(
       shiny::column(6,
                     shiny::div(
@@ -294,7 +311,7 @@ panel_statistics <- function(data, global) {
       round(global$best_mean, 2), 
       round(global$mean_mean, 2))
     all_time_bold <- lapply(list(s3_bold, s5_bold), shiny::strong)
-
+    
     all_time_stats <- shiny::tagList(
       shiny::p(
         shiny::strong(s3_bold),
@@ -305,27 +322,27 @@ panel_statistics <- function(data, global) {
         shiny::br(),
         s5))
   }
-
+  
   list(user = shiny::div(
-         class = "panel panel-info",
-         shiny::div(class = "panel-heading",
-                    shiny::icon(paste("cog", "fa-lg")),
-                    "Your statistics"),
-         shiny::div(class = "panel-body", body_stats)),
-
-       global = shiny::div(
-         class = "panel panel-info",
-         shiny::div(class = "panel-heading",
-                    shiny::icon(paste("cogs", "fa-lg")),
-                    "All time statistics (excluding this session)"),
-         shiny::div(class = "panel-body", all_time_stats)),
-
-       trophies = shiny::div(
-         class = "panel panel-info",
-         shiny::div(class = "panel-heading",
-                    shiny::icon(paste("trophy", "fa-lg")),
-                    "Your achievements"),
-         shiny::div(class = "panel-body", trophies)))
+    class = "panel panel-info",
+    shiny::div(class = "panel-heading",
+               shiny::icon(paste("cog", "fa-lg")),
+               "Your statistics"),
+    shiny::div(class = "panel-body", body_stats)),
+    
+    global = shiny::div(
+      class = "panel panel-info",
+      shiny::div(class = "panel-heading",
+                 shiny::icon(paste("cogs", "fa-lg")),
+                 "All time statistics (excluding this session)"),
+      shiny::div(class = "panel-body", all_time_stats)),
+    
+    trophies = shiny::div(
+      class = "panel panel-info",
+      shiny::div(class = "panel-heading",
+                 shiny::icon(paste("trophy", "fa-lg")),
+                 "Your achievements"),
+      shiny::div(class = "panel-body", trophies)))
 }
 
 
@@ -369,6 +386,7 @@ shiny::shinyServer(
       date = NULL, prev = NULL, data = NULL, global = NULL)
     
     ## Here's the logic moving through the sections
+    
     shiny::observeEvent(
       input$consent, {
         shinyjs::disable("consent")
@@ -377,9 +395,22 @@ shiny::shinyServer(
     
     shiny::observeEvent(
       input$survey, {
-        shinyjs::disable("survey")
-        init_data(values)
-        output$typoapp <- shiny::renderUI(survey_panel())
+        if(input$consent_tick)
+        {
+          # consented
+          shinyjs::disable("survey")
+          init_data(values)
+          output$typoapp <- shiny::renderUI(survey_panel())
+        } else
+        {
+          # did not consent
+          print("did not consent")
+          showModal(modalDialog(
+            title = "Warning",
+            "You need to tick the consent box to continue",
+            easyClose = TRUE
+          ))
+        }
       })
     
     shiny::observeEvent(
