@@ -145,6 +145,13 @@ challenge_panel <- function() {
 
 end_panel <- function(data, global) {
   statistics <- panel_statistics(data, global)
+  withdrawal_title <- "Important information about the data you shared today"
+  id <- "placeholder_id" # TO DO: change this
+  s1 <- "If you have changed your mind "
+  s2 <- "and do not want us to store and use your data today, "
+  s3 <- "please record the following identifier: '"
+  s4 <- "', and email it to us so we can discard your data."
+  withdrawal_txt <- paste0(s1, s2, s3, id, s4)
   shiny::sidebarLayout(
     shiny::sidebarPanel(
       shiny::div(
@@ -166,6 +173,9 @@ end_panel <- function(data, global) {
                           title = "Start as new user")),
     shiny::mainPanel(
       shiny::includeHTML("doc_end.html"),
+      shiny::h4(withdrawal_title),
+      shiny::p(withdrawal_txt),
+      shiny::br(""),
       shiny::includeHTML("doc_sharing.html")))
 }
 
