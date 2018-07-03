@@ -195,15 +195,19 @@ panel_statistics <- function(data, global) {
       "You have not recorded any correct dates (out of %d %s)",
       n_entered, ngettext(n_entered, "try", "tries"))
   } else {
+    s1_bold <- "Total number of entries: "
     s1 <- sprintf(
-      "Total number of entries: %s %s, %s correct %s.\n",
+      "%s %s, %s correct %s.\n",
       n_entered, ngettext(n_entered, "date", "dates"),
       n_correct, ngettext(n_correct, "entry", "entries."))
+    s2_bold <- "Speed (per correct entry): "
     s2 <- sprintf(
-      "Speed (per correct entry): fastest %ss, average %ss.\n",
+      "fastest %ss, average %ss.\n",
       round(data$time_best, 2),
       round(data$time_total / n_correct, 2))
-    body_stats <- lapply(list(s1, s2), shiny::p)
+    body_bold <- lapply(list(s1_bold, s2_bold), tags$b)
+    body <- lapply(list(s1, s2), shiny::p)
+    body_stats <- list(body_bold[[1]], body[[1]], body_bold[[2]], body[[2]])
   }
   
   trophy_levels <- c(0,
