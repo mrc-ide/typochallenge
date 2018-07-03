@@ -1,4 +1,5 @@
 Imports:
   rmnist,
   shiny,
+  shinyjs,
   uuid

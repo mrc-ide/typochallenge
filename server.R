@@ -317,17 +317,20 @@ shiny::shinyServer(
     ## Here's the logic moving through the sections
     shiny::observeEvent(
       input$survey, {
+        shinyjs::disable("survey")
         init_data(values)
         output$typoapp <- shiny::renderUI(survey_panel())
       })
     
     shiny::observeEvent(
       input$instructions, {
+        shinyjs::disable("instructions")
         output$typoapp <- shiny::renderUI(instructions_panel())
       })
     
     shiny::observeEvent(
       input$challenge, {
+        shinyjs::disable("challenge")
         values$survey <- list(
           gender = input$gender, 
           year_birth = input$year_birth,
@@ -343,11 +346,13 @@ shiny::shinyServer(
     
     shiny::observeEvent(
       input$challenge_submit, {
+        shinyjs::disable("challenge_submit")
         isolate({
           values$prev <- validate_date(input$challenge_date, values$date,
                                        values$timestamp)
           values$data <- update_data(values$prev, values$data)
           values$date <- new_date()
+          shinyjs::enable("challenge_submit")
         })
       })
 
@@ -379,6 +384,7 @@ shiny::shinyServer(
     
     shiny::observeEvent(
       input$end, {
+        shinyjs::disable("end")
         shiny::isolate({
           data <- values$data
           output$typoapp <- shiny::renderUI(end_panel(data, data$global))
