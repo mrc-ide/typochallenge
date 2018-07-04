@@ -598,6 +598,8 @@ shiny::shinyServer(
     shiny::observeEvent(
       input$subscribe, {
         save_email(input$email)
+        shiny::updateTextInput(session, "email", value = NA,
+                               placeholder = "Thank you for subscribing!")
       })
     
     shiny::observeEvent(
