@@ -143,50 +143,55 @@ challenge_panel <- function() {
 }
 
 
-end_panel <- function(id, data, global) {
+end_panel <- function(id, data, global, option_to_withdraw = TRUE) {
   statistics <- panel_statistics(data, global)
-  withdrawal_title <- "Important information about the data you shared today"
-  s1 <- "If you have changed your mind "
-  s2 <- "and do not want us to store and use your data today, "
-  s3 <- "please record the following identifier: '"
-  s4 <- "', and "
-  mailto <- "mailto:a.cori@imperial.ac.uk;Marc.Baguelin@phe.gov.uk"
-  subject <- "?subject=Withdrawal%20from%20typo%20challenge"
-  body <- "&body=Please%20remove%20my%20data.%20My%20ID%20is:%20'"
-  s5 <- shiny::a(href=paste0(mailto, subject, body, id, "'."), "email it to us")
-  s6 <- " so we can discard your data."
   
-  withdrawal_txt <- shiny::tagList(
-    shiny::p(
-      s1, s2, s3, id, s4, s5, s6
-    )
-  )
+  if (option_to_withdraw) {
+    withdrawal_title <- "Important information about the data you shared today"
+    withdrawal_msg <- shiny::strong("If you have changed your mind and do not want us to store and use your data today, please tick this box and click on 'withdraw my contribution' below and your data will be discarded automatically. ")
+  }
   
   shiny::sidebarLayout(
     shiny::sidebarPanel(
       shiny::div(
         class = "panel-group",
-        statistics$trophies,
-        statistics$user,
-        statistics$global),
-      shiny::actionButton("continue", "Continue?",
-                          shiny::icon("play"),
-                          class = "btn-success",
-                          title = "Continue, keeping your statistics"),
-      shiny::actionButton("retry", "Retry?",
-                          shiny::icon("refresh"),
-                          class = "btn-primary",
-                          title = "Retry challenge (but keep survey data)"),
-      shiny::actionButton("new_user", "New user",
-                          shiny::icon("user-plus"),
-                          class = "btn-danger",
-                          title = "Start as new user")),
-    shiny::mainPanel(
-      shiny::includeHTML("doc_end.html"),
-      shiny::h4(withdrawal_title),
-      shiny::p(withdrawal_txt),
-      shiny::br(""),
-      shiny::includeHTML("doc_sharing.html")))
+        if(option_to_withdraw) shiny::actionButton("continue", "Continue?",
+                                                   shiny::icon("play"),
+                                                   class = "btn-success",
+                                                   title = "Continue, keeping your statistics"),
+        shiny::actionButton("retry", "Retry?",
+                            shiny::icon("refresh"),
+                            class = "btn-primary",
+                            title = "Retry challenge (but keep survey data)"),
+        shiny::actionButton("new_user", "New user",
+                            shiny::icon("user-plus"),
+                            class = "btn-danger",
+                            title = "Start as new user")),
+        if(option_to_withdraw) statistics$trophies,
+        if(option_to_withdraw) statistics$user,
+        if(option_to_withdraw) statistics$global),
+      
+    
+    if (option_to_withdraw) {
+      shiny::mainPanel(
+        shiny::includeHTML("doc_end.html"),
+        shiny::h4(withdrawal_title),
+        shiny::tagList(
+          shiny::checkboxInput("withdrawal_tick", withdrawal_msg, 
+                               value = FALSE, 
+                               width = '100%')),
+        shiny::actionButton("withdraw", "Withdraw my contribution", 
+                            class = "btn-danger"),
+        shiny::br(""),
+        shiny::includeHTML("doc_sharing.html"))
+    } else
+    {
+      shiny::mainPanel(
+        shiny::includeHTML("doc_end_2.html"),
+        shiny::br(""),
+        shiny::includeHTML("doc_sharing.html"))
+    }
+  )
 }
 
 
@@ -588,6 +593,28 @@ shiny::shinyServer(
           id <- values$id
           output$typoapp <- shiny::renderUI(end_panel(id, data, values$global))
           save_data(values, TRUE, PATH_OUTPUT)
+          # if(input$withdrawal_tick)
+          # {
+          #   # withdrew
+          #   showModal(modalDialog(
+          #     title = "Are you sure? ",
+          #     "To confirm you would like to withdray your contribution to the typo challenge, please click OK, otherwise, click Cancel.",
+          #     easyClose = TRUE
+          #   ))
+          #   #shinyjs::disable("survey")
+          #   discard_data(id, PATH_OUTPUT)
+          #   output$typoapp <- shiny::renderUI(end_panel())
+          # } 
+        })
+      })
+    
+    shiny::observeEvent(
+      input$withdraw, {
+        shinyjs::disable("withdraw")
+        shiny::isolate({
+          data <- values$data
+          id <- values$id
+          output$typoapp <- shiny::renderUI(end_panel(id, data, values$global, option_to_withdraw = FALSE))
         })
       })
     
@@ -667,6 +694,12 @@ save_data <- function(values, clean_exit, path) {
     saveRDS(ret, dest)
     values$data <- NULL
   }
+}
+
+discard_data <- function(id, path)
+{
+  file_to_remove <- file.path(path, sprintf("%s.rds", id))
+  file.remove(file_to_remove)
 }
 
 
