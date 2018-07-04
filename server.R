@@ -160,21 +160,21 @@ end_panel <- function(id, data, global, option_to_withdraw = TRUE) {
                                                    class = "btn-success",
                                                    title = "Continue, keeping your statistics"),
         if(option_to_withdraw) shiny::actionButton("retry", "Retry?",
-                            shiny::icon("refresh"),
-                            class = "btn-primary",
-                            title = "Retry challenge (but keep survey data)"),
-        if(!option_to_withdraw) shiny::actionButton("new_user", "Retry?",
                                                    shiny::icon("refresh"),
                                                    class = "btn-primary",
-                                                   title = "Retry challenge (and don't keep survey data as discarded)"),
+                                                   title = "Retry challenge (but keep survey data)"),
+        if(!option_to_withdraw) shiny::actionButton("new_user", "Retry?",
+                                                    shiny::icon("refresh"),
+                                                    class = "btn-primary",
+                                                    title = "Retry challenge (and don't keep survey data as discarded)"),
         shiny::actionButton("new_user", "New user",
                             shiny::icon("user-plus"),
                             class = "btn-danger",
                             title = "Start as new user")),
-        if(option_to_withdraw) statistics$trophies,
-        if(option_to_withdraw) statistics$user,
-        if(option_to_withdraw) statistics$global),
-      
+      if(option_to_withdraw) statistics$trophies,
+      if(option_to_withdraw) statistics$user,
+      if(option_to_withdraw) statistics$global),
+    
     
     if (option_to_withdraw) {
       shiny::mainPanel(
@@ -612,21 +612,37 @@ shiny::shinyServer(
             # withdrew
             showModal(modalDialog(
               title = "Are you sure? ",
-              "To confirm you would like to withdraw your contribution to the typo challenge, please click OK, otherwise, click Cancel.",
-              easyClose = FALSE
+              "To confirm you would like to withdraw your contribution to the typo challenge, please click 'Withdraw my contribution', otherwise, click 'Dismiss'",
+              shiny::br(),
+              shiny::actionButton("confirm_withdraw", "Withdraw my contribution",
+                                  class = "btn-danger",
+                                  title = "Confirm withdrawal"),
+              easyClose = TRUE
             ))
-            discard_data(id, PATH_OUTPUT)
-            output$typoapp <- shiny::renderUI(end_panel(id, data, values$global, option_to_withdraw = FALSE))
+            output$typoapp <- shiny::renderUI(end_panel(id, data, values$global))
           } else
           {
             # did not withdraw
             showModal(modalDialog(
               title = "Warning",
               "You clicked on 'withdraw my contribution', but didn't tick the box confirming this is what you want to do. Please also tick the box to proceed to withdrawing your data.",
-              easyClose = FALSE
+              easyClose = TRUE
             ))
             output$typoapp <- shiny::renderUI(end_panel(id, data, values$global))
           }
+        })
+      })
+    
+    shiny::observeEvent(
+      input$confirm_withdraw, {
+        shiny::removeModal() # remove the popup asking to confirm withdrawal
+        shinyjs::disable("confirm_withdraw")
+        shiny::isolate({
+          #browser()
+          data <- values$data
+          id <- values$id
+          discard_data(id, PATH_OUTPUT)
+          output$typoapp <- shiny::renderUI(end_panel(id, data, values$global, option_to_withdraw = FALSE))
         })
       })
     
