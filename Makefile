@@ -15,7 +15,7 @@ iframe.png:
 build_cache:
 	Rscript build_cache
 
-emails.txt:
+emails.txt: emails.db/data.mdb
 	Rscript -e 'writeLines(sort(thor::mdb_env("emails.db")[["list"]]()), "$@")'
 
 .PHONY: bootstrap build_cache iframe.png
