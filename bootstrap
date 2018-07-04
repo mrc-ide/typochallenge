@@ -46,7 +46,8 @@
         stop("Failed to bootstrap provisionr")
     }
     src <- provisionr::package_sources(data = structure(list(
-        spec = "github::richfitz/rmnist"), .Names = "spec", class = "package_sources_list"))
+        spec = c("github::richfitz/rmnist", "github::richfitz/thor"
+        )), .Names = "spec", class = "package_sources_list"))
     provisionr::provision_dependencies(".packages", src = src,
         read_travis = FALSE)
     if (!file.exists(".Renviron")) {

@@ -2,4 +2,5 @@ Imports:
   rmnist,
   shiny,
   shinyjs,
+  thor,
   uuid

@@ -137,6 +137,13 @@ end_panel <- function(id, data, global) {
                           "to store and use your data today, please tick this",
                           "box and click on 'withdraw my contribution' below",
                           "and your data will be discarded automatically.")
+  subscribe_txt <- paste("Keep informed about the progress of this study",
+                         "by giving us your email address.  We will store",
+                         "this in a way that is totally separate, and not",
+                         "relateable to your survey data. If you provide",
+                         "an address we will email when we produce research",
+                         "outputs based on the data that you have provided",
+                         "today.")
 
   shiny::sidebarLayout(
     shiny::sidebarPanel(
@@ -167,6 +174,10 @@ end_panel <- function(id, data, global) {
                              width = "100%")),
       shiny::actionButton("withdraw", "Withdraw my contribution",
                           class = "btn-danger"),
+      shiny::br(""),
+      shiny::p(subscribe_txt),
+      shiny::textInput("email", placeholder = "you@server.com"),
+      shiny::actionButton("subscribe", "Subscribe", class = "btn-primary"),
       shiny::br(""),
       shiny::includeHTML("include/doc_sharing.html")))
 }
@@ -583,6 +594,11 @@ shiny::shinyServer(
           save_data(values, TRUE, PATH_OUTPUT)
         })
       })
+
+    shiny::observeEvent(
+      input$subscribe, {
+        save_email(input$email)
+      })
     
     shiny::observeEvent(
       input$withdraw, {
@@ -737,4 +753,24 @@ restore_data <- function(values) {
 
 `%||%` <- function(a, b) {
   if (is.null(a)) b else a
+}
+
+
+## The issue here is that we need to save the email address in a way
+## that:
+##
+## 1. is robust in the face of multiple processes writing at once
+## 2. does not preserve order or time information so it is not
+##    relatable to the actual data
+##
+## The 'thor' package will not save any ordering or time metadata
+## along with the name, is fast, and does between process file
+## locking.
+save_email <- function(address) {
+  dest <- "emails.db"
+  if (!requireNamespace("thor", quietly = TRUE)) {
+    message("'thor' is not installed so not saving addresses")
+    return()
+  }
+  thor::mdb_env(dest)$put(address, "")
 }
