@@ -731,6 +731,7 @@ save_data <- function(values, clean_exit, path) {
 
 discard_data <- function(id, path) {
   file_to_remove <- file.path(path, sprintf("%s.rds", id))
+  message(sprintf("Discarding output for '%s'", id))
   file.remove(file_to_remove)
 }
 
