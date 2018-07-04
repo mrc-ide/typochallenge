@@ -89,7 +89,7 @@ survey_panel <- function() {
       shiny::hr(),
       shiny::actionButton("instructions", "To the typos!", class = "btn-primary")),
     shiny::mainPanel(
-      shiny::img(src = "layouts_cropped.pdf")))
+      shiny::img(src = "layouts_cropped.png")))
 }
 
 
