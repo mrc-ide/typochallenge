@@ -593,18 +593,6 @@ shiny::shinyServer(
           id <- values$id
           output$typoapp <- shiny::renderUI(end_panel(id, data, values$global))
           save_data(values, TRUE, PATH_OUTPUT)
-          # if(input$withdrawal_tick)
-          # {
-          #   # withdrew
-          #   showModal(modalDialog(
-          #     title = "Are you sure? ",
-          #     "To confirm you would like to withdray your contribution to the typo challenge, please click OK, otherwise, click Cancel.",
-          #     easyClose = TRUE
-          #   ))
-          #   #shinyjs::disable("survey")
-          #   discard_data(id, PATH_OUTPUT)
-          #   output$typoapp <- shiny::renderUI(end_panel())
-          # } 
         })
       })
     
@@ -612,9 +600,29 @@ shiny::shinyServer(
       input$withdraw, {
         shinyjs::disable("withdraw")
         shiny::isolate({
+          #browser()
           data <- values$data
           id <- values$id
-          output$typoapp <- shiny::renderUI(end_panel(id, data, values$global, option_to_withdraw = FALSE))
+          if(input$withdrawal_tick)
+          {
+            # withdrew
+            showModal(modalDialog(
+              title = "Are you sure? ",
+              "To confirm you would like to withdraw your contribution to the typo challenge, please click OK, otherwise, click Cancel.",
+              easyClose = FALSE
+            ))
+            discard_data(id, PATH_OUTPUT)
+            output$typoapp <- shiny::renderUI(end_panel(id, data, values$global, option_to_withdraw = FALSE))
+          } else
+          {
+            # did not withdraw
+            showModal(modalDialog(
+              title = "Warning",
+              "You clicked on 'withdraw my contribution', but didn't tick the box confirming this is what you want to do. Please also tick the box to proceed to withdrawing your data.",
+              easyClose = FALSE
+            ))
+            output$typoapp <- shiny::renderUI(end_panel(id, data, values$global))
+          }
         })
       })
     
