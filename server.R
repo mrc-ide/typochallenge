@@ -173,11 +173,14 @@ end_panel <- function(id, data, global) {
                              value = FALSE,
                              width = "100%")),
       shiny::actionButton("withdraw", "Withdraw my contribution",
+                          shiny::icon("trash"),
                           class = "btn-danger"),
       shiny::br(""),
       shiny::p(subscribe_txt),
       shiny::textInput("email", NA, placeholder = "you@server.com"),
-      shiny::actionButton("subscribe", "Subscribe", class = "btn-primary"),
+      shiny::actionButton("subscribe", "Subscribe",
+                          shiny::icon("envelope"),
+                          class = "btn-primary"),
       shiny::br(""),
       shiny::includeHTML("include/doc_sharing.html")))
 }
