@@ -176,7 +176,7 @@ end_panel <- function(id, data, global) {
                           class = "btn-danger"),
       shiny::br(""),
       shiny::p(subscribe_txt),
-      shiny::textInput("email", placeholder = "you@server.com"),
+      shiny::textInput("email", NA, placeholder = "you@server.com"),
       shiny::actionButton("subscribe", "Subscribe", class = "btn-primary"),
       shiny::br(""),
       shiny::includeHTML("include/doc_sharing.html")))
