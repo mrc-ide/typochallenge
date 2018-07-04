@@ -329,7 +329,6 @@ panel_statistics <- function(data, global) {
   } else {
     trophy_correct_fast <- 0L
   }
-  #browser()
   if (trophy_correct == 0) {
     trophies <- "Keep going to get your first trophy!"
   } else {
