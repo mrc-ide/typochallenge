@@ -30,6 +30,7 @@ consent_panel <- function() {
     shiny::includeHTML("include/doc_sharing.html"))
 }
 
+
 survey_panel <- function() {
   shiny::sidebarLayout(
     shiny::sidebarPanel(
@@ -90,6 +91,7 @@ survey_panel <- function() {
     shiny::mainPanel(
       shiny::img(src = "layouts_cropped.pdf")))
 }
+
 
 instructions_panel <- function() {
   shiny::tagList(
