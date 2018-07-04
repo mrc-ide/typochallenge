@@ -11,10 +11,10 @@ cache <- new.env(parent = emptyenv())
 
 start_panel <- function() {
   shiny::tagList(
-    shiny::includeHTML("overview.html"),
+    shiny::includeHTML("include/overview.html"),
     shiny::actionButton("consent", "Begin!",
                         shiny::icon("play"), class = "btn-primary"),
-    shiny::includeHTML("doc_sharing.html"))
+    shiny::includeHTML("include/doc_sharing.html"))
 }
 
 dataModal <- function(failed = FALSE) {
@@ -37,13 +37,13 @@ dataModal <- function(failed = FALSE) {
 consent_panel <- function() {
   consent_msg <- shiny::strong("By ticking this box, you are agreeing for us to store and analyse your data, and to make this data publically available.")
   shiny::tagList(
-    shiny::includeHTML("consent.html"),
+    shiny::includeHTML("include/consent.html"),
     shiny::checkboxInput("consent_tick", consent_msg, 
                          value = FALSE, 
                          width = '100%'),
     shiny::actionButton("survey", "Next step",
                         shiny::icon("play"), class = "btn-primary"),
-    shiny::includeHTML("doc_sharing.html"))
+    shiny::includeHTML("include/doc_sharing.html"))
 }
 
 survey_panel <- function() {
@@ -110,13 +110,13 @@ survey_panel <- function() {
 instructions_panel <- function() {
   shiny::tagList(
     shiny::p("You have not yet started the challenge"),
-    shiny::includeHTML("instructions.html"),
+    shiny::includeHTML("include/instructions.html"),
     shiny::p(
       "To start the challenge, click on the 'Start the challenge' button"),
     shiny::p(shiny::tags$b("Good luck!")),
     shiny::actionButton("challenge", "Start the challenge",
                         class = "btn-primary"),
-    shiny::includeHTML("doc_sharing.html"))
+    shiny::includeHTML("include/doc_sharing.html"))
 }
 
 
@@ -131,7 +131,7 @@ challenge_panel <- function() {
                             class = "btn-warning")
       },
       shiny::hr(),
-      shiny::includeHTML("instructions_short.html"),
+      shiny::includeHTML("include/instructions_short.html"),
       shiny::hr(),
       shiny::actionButton("end", "End the challenge", class = "btn-danger")),
     shiny::mainPanel(
@@ -178,7 +178,7 @@ end_panel <- function(id, data, global, option_to_withdraw = TRUE) {
     
     if (option_to_withdraw) {
       shiny::mainPanel(
-        shiny::includeHTML("doc_end.html"),
+        shiny::includeHTML("include/doc_end.html"),
         shiny::h4(withdrawal_title),
         shiny::tagList(
           shiny::checkboxInput("withdrawal_tick", withdrawal_msg, 
@@ -187,13 +187,13 @@ end_panel <- function(id, data, global, option_to_withdraw = TRUE) {
         shiny::actionButton("withdraw", "Withdraw my contribution", 
                             class = "btn-danger"),
         shiny::br(""),
-        shiny::includeHTML("doc_sharing.html"))
+        shiny::includeHTML("include/doc_sharing.html"))
     } else
     {
       shiny::mainPanel(
-        shiny::includeHTML("doc_end_2.html"),
+        shiny::includeHTML("include/doc_end_2.html"),
         shiny::br(""),
-        shiny::includeHTML("doc_sharing.html"))
+        shiny::includeHTML("include/doc_sharing.html"))
     }
   )
 }
