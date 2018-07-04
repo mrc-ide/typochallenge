@@ -463,16 +463,19 @@ panel_statistics <- function(data, global) {
 
 update_data <- function(prev, data) {
   if (prev$correct) {
+    fast_entry <- prev$elapsed < 5
     if (is.null(data$time_best)) {
       data$time_best <- prev$elapsed
       data$time_total <- prev$elapsed
       data$n_correct <- 1L
-      data$n_correct_fast <- ifelse(prev$elapsed < 5, 1L, 0L)
+      data$n_correct_fast <- if (fast_entry) 1L else 0L
     } else {
       data$time_best <- min(prev$elapsed, data$time_best)
       data$time_total <- prev$elapsed + data$time_total
       data$n_correct <- data$n_correct + 1L
-      if(prev$elapsed < 5) data$n_correct_fast <- data$n_correct_fast + 1L
+      if (fast_entry) {
+        data$n_correct_fast <- data$n_correct_fast + 1L
+      }
     }
   }
   prev$date <- format(prev$date, "%d/%m/%Y")
@@ -727,6 +730,7 @@ save_data <- function(values, clean_exit, path) {
     values$data <- NULL
   }
 }
+
 
 discard_data <- function(id, path) {
   file_to_remove <- file.path(path, sprintf("%s.rds", id))
