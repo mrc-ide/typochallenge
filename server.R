@@ -19,7 +19,7 @@ start_panel <- function() {
 
 
 consent_panel <- function() {
-  consent_msg <- shiny::strong("By ticking this box, you are agreeing for us to store and analyse your data, and to make this data publically available.")
+  consent_msg <- shiny::strong("By ticking this box, you are agreeing that we can store and analyse your data, and we can make this data publically available.")
   shiny::tagList(
     shiny::includeHTML("include/consent.html"),
     shiny::checkboxInput("consent_tick", consent_msg, 
