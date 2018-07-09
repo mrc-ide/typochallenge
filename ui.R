@@ -1,5 +1,6 @@
 shiny::shinyUI(
   shiny::fluidPage(
+    shiny::tags$head(tags$script(src = "bowser.js")),
     shiny::tags$style(shiny::HTML(".trophy-1 {color: #80ced6;}")),  
     shiny::tags$style(shiny::HTML(".trophy-2 {color: #82b74b;}")),  
     shiny::tags$style(shiny::HTML(".trophy-3 {color: #eea29a;}")),  
