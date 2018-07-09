@@ -1,11 +1,13 @@
 $("#challenge_date").keydown(function(event) {
     if (event.keyCode === 13) {
-        var do_submit = function() {
-            // console.log("submitting results");
+        if (bowser.msie == true) {
+            var do_submit = function() {
+                $("#challenge_submit").click();
+            };
+            setTimeout(do_submit, 500);
+        } else {
             $("#challenge_submit").click();
-        };
-        // console.log("recieved enter");
-        setTimeout(do_submit, 500);
+        }
     }
 });
 
