@@ -557,6 +557,7 @@ shiny::shinyServer(
           values$data <- update_data(values$prev, values$data)
           values$date <- new_date()
         })
+        session$sendCustomMessage("focus_challenge_date", "")
       })
     
     if (DEVEL_VERSION) {

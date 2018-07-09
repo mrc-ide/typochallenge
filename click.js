@@ -8,3 +8,7 @@ $("#challenge_date").keydown(function(event) {
         setTimeout(do_submit, 500);
     }
 });
+
+Shiny.addCustomMessageHandler('focus_challenge_date', function(message) {
+    $('#challenge_date').select();
+});
