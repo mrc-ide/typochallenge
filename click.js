@@ -4,7 +4,7 @@ $("#challenge_date").keydown(function(event) {
             var do_submit = function() {
                 $("#challenge_submit").click();
             };
-            setTimeout(do_submit, 500);
+            setTimeout(do_submit, 200);
         } else {
             $("#challenge_submit").click();
         }
