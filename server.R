@@ -143,7 +143,7 @@ end_panel <- function(id, data, global) {
                          "an address we will email when we produce research",
                          "outputs based on the data that you have provided",
                          "today.")
-
+  
   shiny::sidebarLayout(
     shiny::sidebarPanel(
       shiny::div(
@@ -176,7 +176,8 @@ end_panel <- function(id, data, global) {
                           class = "btn-danger"),
       shiny::br(""),
       shiny::p(subscribe_txt),
-      shiny::textInput("email", NA, placeholder = "you@server.com"),
+      shiny::textInput("email", "Enter your email address", placeholder = "you@server.com"),
+      shiny::textInput("email_confirm", "Confirm your email address", placeholder = "you@server.com"),
       shiny::actionButton("subscribe", "Subscribe",
                           shiny::icon("envelope"),
                           class = "btn-primary"),
@@ -597,12 +598,31 @@ shiny::shinyServer(
           save_data(values, TRUE, PATH_OUTPUT)
         })
       })
-
+    
     shiny::observeEvent(
       input$subscribe, {
-        save_email(input$email)
-        shiny::updateTextInput(session, "email", value = NA,
-                               placeholder = "Thank you for subscribing!")
+       # browser()
+        
+        if(are_emails_equal(input$email, input$email_confirm) & is_valid_email(input$email))
+        {
+          showModal(modalDialog(
+            shiny::includeHTML("include/gdpr.html"),
+            title = "Please confirm you want to subscribe",
+            easyClose = TRUE,
+            footer = shiny::tagList(
+              shiny::actionButton("confirm_subscribe",
+                                  "subscribe",
+                                  shiny::icon("envelope"),
+                                  class = "btn-primary",
+                                  title = "Confirm subscription"),
+              modalButton("Dismiss"))))
+        } else
+        {
+          showModal(modalDialog(
+            "Incorrect email address or email addresses not matching. Please correct.",
+            title = "Warning",
+            easyClose = TRUE))
+        }
       })
     
     shiny::observeEvent(
@@ -611,7 +631,7 @@ shiny::shinyServer(
         shiny::isolate({
           data <- values$data
           id <- values$id
-
+          
           txt_confirm <- paste(
             "To confirm you would like to withdraw your contribution to",
             "the typo challenge, please click 'Withdraw my contribution',",
@@ -620,7 +640,7 @@ shiny::shinyServer(
             "You clicked on 'withdraw my contribution', but did not tick",
             "the box confirming this is what you want to do. Please also",
             "tick the box to proceed to withdrawing your data.")
-
+          
           if (input$withdrawal_tick) {
             showModal(modalDialog(
               txt_confirm,
@@ -645,6 +665,7 @@ shiny::shinyServer(
             output$typoapp <- shiny::renderUI(
               end_panel(id, data, values$global))
           }
+          
         })
       })
     
@@ -658,6 +679,22 @@ shiny::shinyServer(
           discard_data(id, PATH_OUTPUT)
           output$typoapp <- shiny::renderUI(end_panel_withdrawn())
         })
+      })
+    
+    shiny::observeEvent(
+      input$confirm_subscribe, {
+        #browser()
+        shiny::removeModal() # remove the popup asking to confirm withdrawal
+          shinyjs::disable("subscribe")
+          save_email(input$email)
+          shiny::updateTextInput(session, "email", 
+                                 label = "Enter your email address",
+                                 value = NA,
+                                 placeholder = "Thank you for subscribing!")
+          shiny::updateTextInput(session, "email_confirm", 
+                                 label = "Confirm your email address",
+                                 value = NA,
+                                 placeholder = "Thank you for subscribing!")
       })
     
     shiny::observeEvent(
@@ -760,7 +797,6 @@ restore_data <- function(values) {
   if (is.null(a)) b else a
 }
 
-
 ## The issue here is that we need to save the email address in a way
 ## that:
 ##
@@ -779,3 +815,14 @@ save_email <- function(address) {
   }
   thor::mdb_env(dest)$put(address, "")
 }
+
+
+is_valid_email <- function(x) { # very basic validation
+  length(strsplit(x, "@", fixed = TRUE)[[1]]) == 2
+}
+
+are_emails_equal <- function(x, y) # needs some work to deal with capital letters and spaces maybe?
+{
+  isTRUE(x == y)
+}
+
