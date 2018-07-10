@@ -3,7 +3,7 @@ source("functions.R")
 
 APP_VERSION <- "1.0.0"
 PATH_OUTPUT <- "contributions"
-DEVEL_VERSION <- TRUE
+DEVEL_VERSION <- FALSE
 COUNTRIES <- readLines("countries.txt")
 
 cache <- new.env(parent = emptyenv())
