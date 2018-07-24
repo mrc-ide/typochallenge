@@ -20,7 +20,7 @@ start_panel <- function() {
 
 
 consent_panel <- function() {
-  consent_msg <- shiny::strong("By ticking this box, you are agreeing that we can store and analyse your data, and we can make this data publically available.")
+  consent_msg <- shiny::strong("By ticking this box, you are confirming that you are 18 years old or older, and you are agreeing that we can store and analyse your data, and we can make this data publically available.")
   shiny::tagList(
     shiny::includeHTML("include/consent.html"),
     shiny::checkboxInput("consent_tick", consent_msg, 
