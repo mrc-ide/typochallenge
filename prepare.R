@@ -1,2 +1,1 @@
-options(rmnist.cache_dir = "rmnist")
-rmnist::download_mnist(verbose = TRUE)
+rmnist::download_mnist(cache_dir = ".rmnist", verbose = TRUE)

@@ -16,7 +16,7 @@ remotes::install_github(c("richfitz/rmnist", "richfitz/thor"), upgrade = FALSE)
 Prepare `rmnist` with
 
 ```r
-rmnist::download_mnist()
+rmnist::download_mnist(cache_dir = ".rmnist", verbose = TRUE)
 ```
 
 which will download all the images.
