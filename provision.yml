@@ -8,5 +8,4 @@ packages:
 package_sources:
   github: richfitz/rmnist
 
-after:
-  - Rscript -e 'rmnist::download_mnist()'
+after: prepare.R
