@@ -6,6 +6,6 @@ packages:
   - uuid
 
 package_sources:
-  github: richfitz/rmnist
+  github: mrc-ide/rmnist
 
 after: prepare.R
