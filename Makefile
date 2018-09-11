@@ -1,12 +1,12 @@
-all: bootstrap rmnist_data
+all:
 
 include/countries.txt:
 	Rscript -e "writeLines(trimws(sort(rworldmap::countryExData[ , 2])), '$@')"
 
-build_cache:
-	Rscript build_cache
+update_googlesheet:
+	Rscript update_googlesheet
 
 emails.txt: emails.db/data.mdb
 	Rscript -e 'writeLines(sort(thor::mdb_env("emails.db")[["list"]]()), "$@")'
 
-.PHONY: build_cache
+.PHONY: update_googlesheet

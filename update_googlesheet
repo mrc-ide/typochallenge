@@ -1,3 +1,3 @@
 #!/usr/bin/env Rscript
 source("R/functions.R")
-build_cache()
+update_googlesheets()
