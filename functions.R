@@ -84,3 +84,8 @@ build_cache <- function(path_output = "contributions") {
     saveRDS(d, path_cache)
   }
 }
+
+
+read_string <- function(filename) {
+  readChar(filename, file.size(filename))
+}

@@ -7,7 +7,7 @@ DEVEL_VERSION <- FALSE
 COUNTRIES <- readLines("countries.txt")
 
 cache <- new.env(parent = emptyenv())
-click_js <- readChar("click.js", file.size("click.js"))
+click_js <- read_string("include/click.js")
 
 
 start_panel <- function() {
