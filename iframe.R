@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-source("functions.R")
+source("R/functions.R")
 
 ## n_objective was chosen with the following reasoning:
 ## if there is 5% of errors, 

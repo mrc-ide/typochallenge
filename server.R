@@ -1,5 +1,5 @@
-source("plot.R")
-source("functions.R")
+source("R/plot.R")
+source("R/functions.R")
 
 APP_VERSION <- "1.0.0"
 PATH_OUTPUT <- "contributions"
