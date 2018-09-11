@@ -1,6 +1,6 @@
 all: bootstrap rmnist_data
 
-countries.txt:
+include/countries.txt:
 	Rscript -e "writeLines(trimws(sort(rworldmap::countryExData[ , 2])), '$@')"
 
 iframe.png:
