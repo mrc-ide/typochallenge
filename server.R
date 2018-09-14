@@ -1,13 +1,13 @@
-source("plot.R")
-source("functions.R")
+source("R/plot.R")
+source("R/functions.R")
 
 APP_VERSION <- "1.0.0"
 PATH_OUTPUT <- "contributions"
 DEVEL_VERSION <- FALSE
-COUNTRIES <- readLines("countries.txt")
+COUNTRIES <- readLines("include/countries.txt")
 
 cache <- new.env(parent = emptyenv())
-click_js <- readChar("click.js", file.size("click.js"))
+click_js <- read_string("include/click.js")
 
 
 start_panel <- function() {

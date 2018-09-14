@@ -7,6 +7,9 @@
 contributions
 .packages
 .Renviron
-iframe.png
 emails.txt
 emails.db
+.lib
+.drat
+.rmnist
+.httr-oauth

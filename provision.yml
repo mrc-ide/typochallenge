@@ -1,0 +1,12 @@
+packages:
+  - googlesheets
+  - rmnist
+  - shiny
+  - shinyjs
+  - thor
+  - uuid
+
+package_sources:
+  github: mrc-ide/rmnist
+
+after: prepare.R

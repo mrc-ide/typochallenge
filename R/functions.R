@@ -76,11 +76,37 @@ read_contribution <- function(p, path_output = "contributions", cache = NULL) {
 
 build_cache <- function(path_output = "contributions") {
   path_cache <- file.path(path_output, ".cache.rds")
-  unlink(path_cache)
   files <- dir(path_output, pattern = "\\.rds$")
-  if (length(files) > 0L) {
+  if (length(files) == 0) {
+    unlink(path_cache)
+  } else {
     d <- lapply(files, read_contribution, path_output, NULL)
     names(d) <- files
+    unlink(path_cache)
     saveRDS(d, path_cache)
   }
+}
+
+
+read_string <- function(filename) {
+  readChar(filename, file.size(filename))
+}
+
+
+update_googlesheets <- function() {
+  build_cache()
+  d <- read_contributions()
+
+  if (is.null(d)) {
+    n_total <- 0L
+    n_contributions <- 0L
+  } else {
+    n_total <- d$total_sum
+    n_contributions <- d$n_contributions
+  }
+
+  key <- "1EFEDot3AY4DGP0X7ZEJbOEMfBj4QpWjBmhPDeEyhrTE"
+  sheet <- googlesheets::gs_key(key)
+  googlesheets::gs_edit_cells(sheet, 1L, n_total, "B4")
+  googlesheets::gs_edit_cells(sheet, 3L, n_contributions, "A1")
 }

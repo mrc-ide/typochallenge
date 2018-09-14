@@ -194,7 +194,7 @@ plot_handwritten_date <- function(date = as.Date("01/01/2017",
                                                  format = "%d/%m/%Y"),
                                   d = NULL) {
   if (is.null(d)) {
-    d <- rmnist::load_mnist(download_if_missing = TRUE)
+    d <- rmnist::load_mnist(download_if_missing = TRUE, cache_dir = ".rmnist")
   }
   if (!inherits(date, "Date")) {
     stop("date should be in date format.") # date has to be a date
