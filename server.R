@@ -9,6 +9,11 @@ COUNTRIES <- readLines("include/countries.txt")
 cache <- new.env(parent = emptyenv())
 click_js <- read_string("include/click.js")
 
+if (file.exists(".redis")) {
+  readRenviron(".redis")
+}
+redis_url <- Sys.getenv("REDIS_URL", NA_character_)
+has_redis <- !is.na(redis_url) && requireNamespace("redux", quietly = TRUE)
 
 start_panel <- function() {
   shiny::tagList(
@@ -773,6 +778,11 @@ save_data <- function(values, clean_exit, path) {
                 data = data_to_table(values$data))
     dest <- file.path(path, sprintf("%s.rds", ret$id))
     saveRDS(ret, dest)
+
+    if (has_redis) {
+      redux::hiredis()$HSET("contributions", ret$id, redux::object_to_bin(ret))
+    }
+
     values$data <- NULL
   }
 }
@@ -782,6 +792,9 @@ discard_data <- function(id, path) {
   file_to_remove <- file.path(path, sprintf("%s.rds", id))
   message(sprintf("Discarding output for '%s'", id))
   file.remove(file_to_remove)
+  if (has_redis) {
+    redux::hiredis()$HDEL("contributions", id)
+  }
 }
 
 
@@ -816,6 +829,10 @@ save_email <- function(address) {
     return()
   }
   thor::mdb_env(dest)$put(address, "")
+
+  if (has_redis) {
+    redux::hiredis()$SADD("emails", address)
+  }
 }
 
 
