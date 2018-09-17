@@ -96,6 +96,7 @@ read_string <- function(filename) {
 update_googlesheets <- function() {
   build_cache()
   d <- read_contributions()
+  googlesheets::gs_auth(token = ".googlesheets-oauth")
 
   if (is.null(d)) {
     n_total <- 0L
