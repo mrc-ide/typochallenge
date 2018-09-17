@@ -9,11 +9,7 @@ COUNTRIES <- readLines("include/countries.txt")
 cache <- new.env(parent = emptyenv())
 click_js <- read_string("include/click.js")
 
-if (file.exists(".redis")) {
-  readRenviron(".redis")
-}
-redis_url <- Sys.getenv("REDIS_URL", NA_character_)
-has_redis <- !is.na(redis_url) && requireNamespace("redux", quietly = TRUE)
+has_redis <- check_redis()
 
 start_panel <- function() {
   shiny::tagList(

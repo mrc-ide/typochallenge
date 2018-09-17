@@ -111,3 +111,24 @@ update_googlesheets <- function() {
   googlesheets::gs_edit_cells(sheet, 1L, n_total, "B4")
   googlesheets::gs_edit_cells(sheet, 3L, n_contributions, "A1")
 }
+
+
+check_redis <- function(path = ".redis") {
+  if (!file.exists(path)) {
+    return(FALSE)
+  }
+  if (!requireNamespace("redux", quietly = TRUE)) {
+    return(FALSE)
+  }
+  redis_url <- readLines(path)
+  con <- tryCatch(redux::hiredis(url = redis_url), error = identity)
+  if (inherits(con, "error")) {
+    return(FALSE)
+  }
+  ok <- tryCatch(con$PING(), error = identity)
+  if (inherits(ok, "error")) {
+    return(FALSE)
+  }
+  Sys.setenv(REDIS_URL = redis_url)
+  TRUE
+}
