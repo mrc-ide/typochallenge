@@ -50,7 +50,7 @@ survey_panel <- function() {
                          selectize = TRUE),
       
       shiny::selectInput("year_birth", "Please select your year of birth:", 
-                         choices = c("", 2018:1900),
+                         choices = c("", 2000:1900),
                          selectize = TRUE),
       
       shiny::selectInput("country_from", "Where are you from?", 
