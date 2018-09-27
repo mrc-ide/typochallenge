@@ -6,7 +6,6 @@ PATH_OUTPUT <- "contributions"
 DEVEL_VERSION <- FALSE
 COUNTRIES <- readLines("include/countries.txt")
 
-cache <- new.env(parent = emptyenv())
 click_js <- read_string("include/click.js")
 
 has_redis <- check_redis()
@@ -496,7 +495,7 @@ init_data <- function(values) {
   values$date <- NULL
   values$prev <- NULL
   values$data <- list()
-  values$global <- read_contributions(cache = cache)
+  values$global <- read_stats(has_redis)
   message(sprintf("Starting session: '%s'", values$id))
 }
 
