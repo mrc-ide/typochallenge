@@ -92,6 +92,7 @@ build_overall_statistics <- function(d) {
 
 summarise_contribution <- function(d) {
   i <- d$data$correct
+  t <- d$data$elapsed[i]
   list(
     id = d$id,
     id_parent = if (is.null(d$id_parent)) d$id else d$id_parent,
@@ -99,7 +100,7 @@ summarise_contribution <- function(d) {
     correct = sum(i),
     best = if (any(i)) min(t) else NA_real_,
     mean = if (any(i)) mean(t) else NA_real_,
-    correct_less_5s = if (any(i)) sum(d$data$elapsed[i] < 5) else 0L)
+    correct_less_5s = if (any(i)) sum(t < 5) else 0L)
 }
 
 
