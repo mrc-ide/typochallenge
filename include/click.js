@@ -4,7 +4,7 @@ $("#challenge_date").keydown(function(event) {
             var do_submit = function() {
                 $("#challenge_submit").click();
             };
-            setTimeout(do_submit, 200);
+            setTimeout(do_submit, 350);
         } else  if (bowser.firefox == true) {
             var do_submit = function() {
                 $("#challenge_submit").click();
