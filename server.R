@@ -6,9 +6,9 @@ PATH_OUTPUT <- "contributions"
 DEVEL_VERSION <- FALSE
 COUNTRIES <- readLines("include/countries.txt")
 
-cache <- new.env(parent = emptyenv())
 click_js <- read_string("include/click.js")
 
+has_redis <- check_redis()
 
 start_panel <- function() {
   shiny::tagList(
@@ -176,8 +176,10 @@ end_panel <- function(id, data, global) {
                           class = "btn-danger"),
       shiny::br(""),
       shiny::p(subscribe_txt),
-      shiny::textInput("email", "Enter your email address", placeholder = "you@server.com"),
-      shiny::textInput("email_confirm", "Confirm your email address", placeholder = "you@server.com"),
+      shiny::textInput("email", "Enter your email address",
+                       placeholder = "you@server.com"),
+      shiny::textInput("email_confirm", "Confirm your email address",
+                       placeholder = "you@server.com"),
       shiny::actionButton("subscribe", "Subscribe",
                           shiny::icon("envelope"),
                           class = "btn-primary"),
@@ -493,7 +495,7 @@ init_data <- function(values) {
   values$date <- NULL
   values$prev <- NULL
   values$data <- list()
-  values$global <- read_contributions(cache = cache)
+  values$global <- read_stats(has_redis)
   message(sprintf("Starting session: '%s'", values$id))
 }
 
@@ -611,7 +613,7 @@ shiny::shinyServer(
             easyClose = TRUE,
             footer = shiny::tagList(
               shiny::actionButton("confirm_subscribe",
-                                  "subscribe",
+                                  "Subscribe",
                                   shiny::icon("envelope"),
                                   class = "btn-primary",
                                   title = "Confirm subscription"),
@@ -771,6 +773,11 @@ save_data <- function(values, clean_exit, path) {
                 data = data_to_table(values$data))
     dest <- file.path(path, sprintf("%s.rds", ret$id))
     saveRDS(ret, dest)
+
+    if (has_redis) {
+      redux::hiredis()$HSET("contributions", ret$id, redux::object_to_bin(ret))
+    }
+
     values$data <- NULL
   }
 }
@@ -780,6 +787,9 @@ discard_data <- function(id, path) {
   file_to_remove <- file.path(path, sprintf("%s.rds", id))
   message(sprintf("Discarding output for '%s'", id))
   file.remove(file_to_remove)
+  if (has_redis) {
+    redux::hiredis()$HDEL("contributions", id)
+  }
 }
 
 
@@ -814,6 +824,10 @@ save_email <- function(address) {
     return()
   }
   thor::mdb_env(dest)$put(address, "")
+
+  if (has_redis) {
+    redux::hiredis()$SADD("emails", address)
+  }
 }
 
 

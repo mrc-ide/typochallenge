@@ -13,3 +13,4 @@ emails.db
 .drat
 .rmnist
 .httr-oauth
+.redis

@@ -1,90 +1,106 @@
-read_contributions <- function(path_output = "contributions", cache = NULL) {
-  path_cache <- file.path(path_output, ".cache.rds")
-  if (file.exists(path_cache)) {
-    d <- readRDS(path_cache)
+KEY_PREFIX <- "shiny_dide:typochallenge:"
+KEY_PREFIX <- ""
+KEY_CONTRIBUTIONS <- paste0(KEY_PREFIX, "contributions")
+KEY_CACHE <- paste0(KEY_PREFIX, "cache")
+KEY_STATS <- paste0(KEY_PREFIX, "stats")
+KEY_EMAILS <- paste0(KEY_PREFIX, "emails")
+
+read_stats <- function(redis) {
+  if (redis) {
+    read_stats_redis()
   } else {
-    d <- NULL
+    read_stats_disk()
   }
+}
 
+
+read_stats_disk <- function(path_output = "contributions") {
   files <- dir(path_output, pattern = "\\.rds$")
-  files_new <- setdiff(files, names(d))
-  d <- c(
-    unname(d),
-    lapply(files_new, read_contribution, path_output, cache))
-
-  i <- !vapply(d, is.null, logical(1))
-  if (any(i)) {
-    d <- d[i]
-    s <- as.data.frame(do.call("rbind", d))
-    ### need to convert numeric columns to numeric ###
-    s[, "total"] <- as.numeric(as.character(s[, "total"]))
-    s[, "correct"] <- as.numeric(as.character(s[, "correct"]))
-    s[, "best"] <- as.numeric(as.character(s[, "best"]))
-    s[, "mean"] <- as.numeric(as.character(s[, "mean"]))
-    s[, "correct_less_5s"] <- as.numeric(as.character(s[, "correct_less_5s"]))
-    
-    if (all(is.na(s[, "best"]))) {
-      ## Still just testing here.
-      return(NULL)
-    }
-    list(total_sum = as.integer(sum(s[, "total"])),
-         total_mean = mean(s[, "total"]),
-         total_max = max(s[, "total"]),
-         correct_sum = as.integer(sum(s[, "correct"])),
-         correct_mean = mean(s[, "correct"]),
-         correct_max = as.integer(max(s[, "correct"])),
-         best_total = as.integer(max(s[, "total"])),
-         best_correct = as.integer(max(s[, "correct"])),
-         best_best = min(s[, "best"], na.rm = TRUE),
-         best_mean = mean(s[, "best"], na.rm = TRUE),
-         best_mean = min(s[, "mean"], na.rm = TRUE),
-         mean_mean = mean(s[, "mean"], na.rm = TRUE),
-         correct_less_5s_sum = as.integer(sum(s[, "correct_less_5s"])),
-         correct_less_5s_mean = mean(s[, "correct_less_5s"]),
-         correct_less_5s_max = max(s[, "correct_less_5s"]),
-         n_contributions = length(unique(s[, "id_parent"])))
+  if (length(files) > 0L) {
+    d <- lapply(files, read_contribution_disk, path_output)
+    dat <- combine_contributions(d)
+    build_overall_statistics(dat)
   } else {
     NULL
   }
 }
 
 
-read_contribution <- function(p, path_output = "contributions", cache = NULL) {
-  if (p %in% names(cache)) {
-    return(cache[[p]])
-  }
+read_contribution_disk <- function(p, path_output = "contributions") {
   d <- readRDS(file.path(path_output, p))
-  i <- d$data$correct
-  if (length(i) > 0L) {
-    t <- d$data$elapsed[i]
-    ret <- c(id = d$id, 
-             id_parent = ifelse(is.null(d$id_parent), d$id, d$id_parent),
-             total = length(i),
-             correct = sum(i),
-             best = if (any(i)) min(t) else NA_real_,
-             mean = if (any(i)) mean(t) else NA_real_,
-             correct_less_5s = if (any(i)) sum(d$data$elapsed[i] < 5) else 0L)
-  } else {
-    ret <- NULL
-  }
-  if (!is.null(cache)) {
-    cache[[p]] <- ret
-  }
-  ret
+  summarise_contribution(d)
 }
 
 
-build_cache <- function(path_output = "contributions") {
-  path_cache <- file.path(path_output, ".cache.rds")
-  files <- dir(path_output, pattern = "\\.rds$")
-  if (length(files) == 0) {
-    unlink(path_cache)
-  } else {
-    d <- lapply(files, read_contribution, path_output, NULL)
-    names(d) <- files
-    unlink(path_cache)
-    saveRDS(d, path_cache)
+read_stats_redis <- function(readonly = FALSE) {
+  con <- redux::hiredis()
+
+  ## This could be done faster but with more complexity by keeping a
+  ## set of seen and unseen keys and using 'SDIFF'
+  d <- con$GET(KEY_CACHE)
+  if (!is.null(d)) {
+    d <- redux::bin_to_object(d)
   }
+
+  ids <- list_to_character(con$HKEYS(KEY_CONTRIBUTIONS))
+  ids_new <- setdiff(ids, d$id)
+
+  if (length(ids_new) == 0L) {
+    stats <- redux::bin_to_object(con$GET(KEY_STATS))
+  } else {
+    d_new <- lapply(ids_new, function(id)
+      summarise_contribution(
+        redux::bin_to_object(con$HGET(KEY_CONTRIBUTIONS, id))))
+    d_all <- rbind(d, combine_contributions(d_new))
+    stats <- build_overall_statistics(d_all)
+    if (!readonly) {
+      con$SET(KEY_CACHE, redux::object_to_bin(d_all))
+      con$SET(KEY_STATS, redux::object_to_bin(stats))
+    }
+  }
+
+  stats
+}
+
+
+build_overall_statistics <- function(d) {
+  if (is.null(d)) {
+    return(NULL)
+  }
+  d <- d[d$total > 0, ]
+  if (nrow(d) == 0) {
+    return(NULL)
+  }
+  list(total_sum = as.integer(sum(d$total)),
+       total_mean = mean(d$total),
+       total_max = max(d$total),
+       correct_sum = as.integer(sum(d$correct)),
+       correct_mean = mean(d$correct),
+       correct_max = as.integer(max(d$correct)),
+       best_total = as.integer(max(d$total)),
+       best_correct = as.integer(max(d$correct)),
+       best_best = min(d$best, na.rm = TRUE),
+       best_mean = mean(d$best, na.rm = TRUE),
+       best_mean = min(d$mean, na.rm = TRUE),
+       mean_mean = mean(d$mean, na.rm = TRUE),
+       correct_less_5s_sum = as.integer(sum(d$correct_less_5s)),
+       correct_less_5s_mean = mean(d$correct_less_5s),
+       correct_less_5s_max = max(d$correct_less_5s),
+       n_contributions = length(unique(d$id_parent)))
+}
+
+
+summarise_contribution <- function(d) {
+  i <- d$data$correct
+  t <- d$data$elapsed[i]
+  list(
+    id = d$id,
+    id_parent = if (is.null(d$id_parent)) d$id else d$id_parent,
+    total = length(i),
+    correct = sum(i),
+    best = if (any(i)) min(t) else NA_real_,
+    mean = if (any(i)) mean(t) else NA_real_,
+    correct_less_5s = if (any(i)) sum(t < 5) else 0L)
 }
 
 
@@ -94,8 +110,8 @@ read_string <- function(filename) {
 
 
 update_googlesheets <- function() {
-  build_cache()
-  d <- read_contributions()
+  d <- read_stats_redis(readonly = FALSE)
+  googlesheets::gs_auth(token = ".googlesheets-oauth")
 
   if (is.null(d)) {
     n_total <- 0L
@@ -109,4 +125,43 @@ update_googlesheets <- function() {
   sheet <- googlesheets::gs_key(key)
   googlesheets::gs_edit_cells(sheet, 1L, n_total, "B4")
   googlesheets::gs_edit_cells(sheet, 3L, n_contributions, "A1")
+}
+
+
+check_redis <- function(path = ".redis") {
+  if (!file.exists(path)) {
+    return(FALSE)
+  }
+  if (!requireNamespace("redux", quietly = TRUE)) {
+    return(FALSE)
+  }
+  redis_url <- readLines(path)
+  con <- tryCatch(redux::hiredis(url = redis_url), error = identity)
+  if (inherits(con, "error")) {
+    return(FALSE)
+  }
+  ok <- tryCatch(con$PING(), error = identity)
+  if (inherits(ok, "error")) {
+    return(FALSE)
+  }
+  Sys.setenv(REDIS_URL = redis_url)
+  TRUE
+}
+
+
+combine_contributions <- function(d) {
+  d <- d[!vapply(d, function(x) is.null(x$id), TRUE)]
+  if (length(d) == 0L) {
+    return(NULL)
+  }
+  i <- lengths(lapply(d, "[[", "id"))
+  ex <- d[[1L]]
+  res <- lapply(seq_along(ex), function(i) vapply(d, "[[", ex[[i]], i))
+  names(res) <- names(ex)
+  data.frame(res, check.names = FALSE, stringsAsFactors = FALSE)
+}
+
+
+list_to_character <- function(x) {
+  vapply(x, identity, "")
 }
