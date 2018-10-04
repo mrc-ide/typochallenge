@@ -10,12 +10,11 @@ click_js <- read_string("include/click.js")
 
 has_redis <- check_redis()
 
-start_panel <- function() {
-  
-  statistics <- panel_statistics(data = list(), 
-                                 global = read_stats(has_redis), 
-                                 title_global = 
-                                   "Typo Challenge statistics so far")
+start_panel <- function(global) {
+  statistics <- panel_statistics(
+    data = list(),
+    global = global,
+    title_global = "Typo Challenge statistics so far")
   
   shiny::sidebarLayout(
     shiny::sidebarPanel(
@@ -26,10 +25,6 @@ start_panel <- function() {
         shiny::actionButton("consent", "Begin!",
                             shiny::icon("play"), class = "btn-primary"),
         shiny::includeHTML("include/doc_sharing.html"))))
-  
-  
-
-  
 }
 
 
@@ -509,7 +504,6 @@ init_data <- function(values) {
   values$date <- NULL
   values$prev <- NULL
   values$data <- list()
-  values$global <- read_stats(has_redis)
   message(sprintf("Starting session: '%s'", values$id))
 }
 
@@ -518,7 +512,7 @@ shiny::shinyServer(
   function(input, output, session) {
     values <- shiny::reactiveValues(
       id = NULL, start_time = NULL, survey = NULL, timestamp = NULL,
-      date = NULL, prev = NULL, data = NULL, global = NULL)
+      date = NULL, prev = NULL, data = NULL, global = read_stats(has_redis))
     
     ## Here's the logic moving through the sections
     
@@ -715,7 +709,7 @@ shiny::shinyServer(
     
     shiny::observeEvent(
       input$new_user, {
-        output$typoapp <- shiny::renderUI(start_panel())
+        output$typoapp <- shiny::renderUI(start_panel(values$global))
       })
     
     shiny::observeEvent(
@@ -735,7 +729,7 @@ shiny::shinyServer(
         values$date <- new_date()
       })
     
-    output$typoapp <- shiny::renderUI(start_panel())
+    output$typoapp <- shiny::renderUI(start_panel(values$global))
     
     session$onSessionEnded(function() {
       isolate({
