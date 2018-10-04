@@ -10,12 +10,20 @@ click_js <- read_string("include/click.js")
 
 has_redis <- check_redis()
 
-start_panel <- function() {
-  shiny::tagList(
-    shiny::includeHTML("include/overview.html"),
-    shiny::actionButton("consent", "Begin!",
-                        shiny::icon("play"), class = "btn-primary"),
-    shiny::includeHTML("include/doc_sharing.html"))
+start_panel <- function(global) {
+  statistics <- panel_statistics(
+    data = list(),
+    global = global,
+    title_global = "Typo Challenge statistics so far")
+
+  shiny::fluidRow(
+    shiny::column(
+      8,
+      shiny::includeHTML("include/overview.html"),
+      shiny::actionButton("consent", "Begin!",
+                          shiny::icon("play"), class = "btn-primary"),
+      shiny::includeHTML("include/doc_sharing.html")),
+    shiny::column(4, statistics$global))
 }
 
 
@@ -80,7 +88,7 @@ survey_panel <- function() {
                          selectize = TRUE),
       
       shiny::selectInput("survey_keyboard_input",
-                         "Do you use the numeric keypad or the row of numbers to enter numbers (see image on right panel)",
+                         "For this challenge, will you be using the numeric keypad or the row of numbers to enter numbers (see image on right panel)",
                          choices = c("", 
                                      list("Numeric keypad (purple keys, right of keyboard)",
                                           "Top row (blue keys, top of keyboard)",
@@ -268,7 +276,7 @@ render_prev <- function(prev, data, global) {
 }
 
 
-panel_statistics <- function(data, global) {
+panel_statistics <- function(data, global, title_global = "All time statistics (excluding this session)") {
   n_entered <- length(data$rows)
   n_correct <- data$n_correct
   n_correct_fast <- data$n_correct_fast
@@ -451,7 +459,7 @@ panel_statistics <- function(data, global) {
       class = "panel panel-info",
       shiny::div(class = "panel-heading",
                  shiny::icon(paste("cogs", "fa-lg")),
-                 "All time statistics (excluding this session)"),
+                 title_global),
       shiny::div(class = "panel-body", all_time_stats)),
     
     trophies = shiny::div(
@@ -495,7 +503,6 @@ init_data <- function(values) {
   values$date <- NULL
   values$prev <- NULL
   values$data <- list()
-  values$global <- read_stats(has_redis)
   message(sprintf("Starting session: '%s'", values$id))
 }
 
@@ -504,7 +511,7 @@ shiny::shinyServer(
   function(input, output, session) {
     values <- shiny::reactiveValues(
       id = NULL, start_time = NULL, survey = NULL, timestamp = NULL,
-      date = NULL, prev = NULL, data = NULL, global = NULL)
+      date = NULL, prev = NULL, data = NULL, global = read_stats(has_redis))
     
     ## Here's the logic moving through the sections
     
@@ -701,7 +708,7 @@ shiny::shinyServer(
     
     shiny::observeEvent(
       input$new_user, {
-        output$typoapp <- shiny::renderUI(start_panel())
+        output$typoapp <- shiny::renderUI(start_panel(values$global))
       })
     
     shiny::observeEvent(
@@ -721,7 +728,7 @@ shiny::shinyServer(
         values$date <- new_date()
       })
     
-    output$typoapp <- shiny::renderUI(start_panel())
+    output$typoapp <- shiny::renderUI(start_panel(values$global))
     
     session$onSessionEnded(function() {
       isolate({
