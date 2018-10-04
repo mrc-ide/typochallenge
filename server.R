@@ -80,7 +80,7 @@ survey_panel <- function() {
                          selectize = TRUE),
       
       shiny::selectInput("survey_keyboard_input",
-                         "Do you use the numeric keypad or the row of numbers to enter numbers (see image on right panel)",
+                         "For this challenge, will you be using the numeric keypad or the row of numbers to enter numbers (see image on right panel)",
                          choices = c("", 
                                      list("Numeric keypad (purple keys, right of keyboard)",
                                           "Top row (blue keys, top of keyboard)",
