@@ -15,16 +15,15 @@ start_panel <- function(global) {
     data = list(),
     global = global,
     title_global = "Typo Challenge statistics so far")
-  
-  shiny::sidebarLayout(
-    shiny::sidebarPanel(
-        statistics$global),
-    shiny::mainPanel(
-      shiny::tagList(
-        shiny::includeHTML("include/overview.html"),
-        shiny::actionButton("consent", "Begin!",
-                            shiny::icon("play"), class = "btn-primary"),
-        shiny::includeHTML("include/doc_sharing.html"))))
+
+  shiny::fluidRow(
+    shiny::column(
+      8,
+      shiny::includeHTML("include/overview.html"),
+      shiny::actionButton("consent", "Begin!",
+                          shiny::icon("play"), class = "btn-primary"),
+      shiny::includeHTML("include/doc_sharing.html")),
+    shiny::column(4, statistics$global))
 }
 
 
