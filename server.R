@@ -12,8 +12,6 @@ has_redis <- check_redis()
 
 start_panel <- function() {
   
-  #browser()
-  
   statistics <- panel_statistics(data = list(), 
                                  global = read_stats(has_redis), 
                                  title_global = 
