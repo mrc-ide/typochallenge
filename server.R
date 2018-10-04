@@ -11,11 +11,27 @@ click_js <- read_string("include/click.js")
 has_redis <- check_redis()
 
 start_panel <- function() {
-  shiny::tagList(
-    shiny::includeHTML("include/overview.html"),
-    shiny::actionButton("consent", "Begin!",
-                        shiny::icon("play"), class = "btn-primary"),
-    shiny::includeHTML("include/doc_sharing.html"))
+  
+  #browser()
+  
+  statistics <- panel_statistics(data = list(), 
+                                 global = read_stats(has_redis), 
+                                 title_global = 
+                                   "Typo Challenge statistics so far")
+  
+  shiny::sidebarLayout(
+    shiny::sidebarPanel(
+        statistics$global),
+    shiny::mainPanel(
+      shiny::tagList(
+        shiny::includeHTML("include/overview.html"),
+        shiny::actionButton("consent", "Begin!",
+                            shiny::icon("play"), class = "btn-primary"),
+        shiny::includeHTML("include/doc_sharing.html"))))
+  
+  
+
+  
 }
 
 
@@ -268,7 +284,7 @@ render_prev <- function(prev, data, global) {
 }
 
 
-panel_statistics <- function(data, global) {
+panel_statistics <- function(data, global, title_global = "All time statistics (excluding this session)") {
   n_entered <- length(data$rows)
   n_correct <- data$n_correct
   n_correct_fast <- data$n_correct_fast
@@ -451,7 +467,7 @@ panel_statistics <- function(data, global) {
       class = "panel panel-info",
       shiny::div(class = "panel-heading",
                  shiny::icon(paste("cogs", "fa-lg")),
-                 "All time statistics (excluding this session)"),
+                 title_global),
       shiny::div(class = "panel-body", all_time_stats)),
     
     trophies = shiny::div(
