@@ -782,7 +782,8 @@ save_data <- function(values, clean_exit, path) {
     saveRDS(ret, dest)
 
     if (has_redis) {
-      redux::hiredis()$HSET("contributions", ret$id, redux::object_to_bin(ret))
+      redux::hiredis()$HSET(KEY_CONTRIBUTIONS, ret$id,
+                            redux::object_to_bin(ret))
     }
 
     values$data <- NULL
@@ -795,7 +796,7 @@ discard_data <- function(id, path) {
   message(sprintf("Discarding output for '%s'", id))
   file.remove(file_to_remove)
   if (has_redis) {
-    redux::hiredis()$HDEL("contributions", id)
+    redux::hiredis()$HDEL(KEY_CONTRIBUTIONS, id)
   }
 }
 
@@ -833,7 +834,7 @@ save_email <- function(address) {
   thor::mdb_env(dest)$put(address, "")
 
   if (has_redis) {
-    redux::hiredis()$SADD("emails", address)
+    redux::hiredis()$SADD(KEY_EMAILS, address)
   }
 }
 
