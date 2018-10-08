@@ -112,6 +112,9 @@ read_string <- function(filename) {
 
 
 update_googlesheets <- function() {
+  if (!check_redis()) {
+    stop("Redis connection not configured")
+  }
   d <- read_stats_redis(readonly = FALSE)
   googlesheets::gs_auth(token = ".googlesheets-oauth")
 
