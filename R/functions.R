@@ -1,5 +1,4 @@
 KEY_PREFIX <- "shiny_dide:typochallenge:"
-KEY_PREFIX <- ""
 KEY_CONTRIBUTIONS <- paste0(KEY_PREFIX, "contributions")
 KEY_CACHE <- paste0(KEY_PREFIX, "cache")
 KEY_STATS <- paste0(KEY_PREFIX, "stats")
