@@ -45,7 +45,10 @@ read_stats_redis <- function(readonly = FALSE) {
   ids_new <- setdiff(ids, d$id)
 
   if (length(ids_new) == 0L) {
-    stats <- redux::bin_to_object(con$GET(KEY_STATS))
+    stats <- con$GET(KEY_STATS)
+    if (!is.null(stats)) {
+      stats <- redux::bin_to_object(stats)
+    }
   } else {
     d_new <- lapply(ids_new, function(id)
       summarise_contribution(
