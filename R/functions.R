@@ -82,7 +82,7 @@ build_overall_statistics <- function(d) {
        best_total = as.integer(max(d$total)),
        best_correct = as.integer(max(d$correct)),
        best_best = min(d$best, na.rm = TRUE),
-       best_mean = mean(d$best, na.rm = TRUE),
+       mean_best = mean(d$best, na.rm = TRUE),
        best_mean = min(d$mean, na.rm = TRUE),
        mean_mean = mean(d$mean, na.rm = TRUE),
        correct_less_5s_sum = as.integer(sum(d$correct_less_5s)),

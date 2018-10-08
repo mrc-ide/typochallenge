@@ -403,7 +403,7 @@ panel_statistics <- function(data, global, title_global = "All time statistics (
     s4_bold <- "Speed (per correct entry): "
     s4 <- sprintf(
       "fastest %ss, average %ss.\n",
-      round(global$best_mean, 2), 
+      round(global$best_best, 2), 
       round(global$mean_mean, 2))
     all_time_bold <- lapply(list(s3_bold, s4_bold), shiny::strong)
     
