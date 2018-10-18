@@ -14,3 +14,4 @@ emails.db
 .rmnist
 .httr-oauth
 .redis
+contributions.rds
