@@ -5,12 +5,36 @@ APP_VERSION <- "1.0.0"
 PATH_OUTPUT <- "contributions"
 DEVEL_VERSION <- FALSE
 COUNTRIES <- readLines("include/countries.txt")
+CHALLENGE_OVER <- challenge_is_over()
 
 click_js <- read_string("include/click.js")
 
 has_redis <- check_redis()
 
 start_panel <- function(global) {
+  if (CHALLENGE_OVER) {
+    start_panel_ended(global)
+  } else {
+    start_panel_begin(global)
+  }
+}
+
+
+start_panel_ended <- function(global) {
+  statistics <- panel_statistics(
+    data = list(),
+    global = global,
+    title_global = "Typo Challenge statistics")
+
+  shiny::fluidRow(
+    shiny::column(
+      8,
+      shiny::includeHTML("include/ended.html")),
+    shiny::column(4, statistics$global))
+}
+
+
+start_panel_begin <- function(global) {
   statistics <- panel_statistics(
     data = list(),
     global = global,
@@ -22,6 +46,21 @@ start_panel <- function(global) {
       shiny::includeHTML("include/overview.html"),
       shiny::actionButton("consent", "Begin!",
                           shiny::icon("play"), class = "btn-primary"),
+      shiny::includeHTML("include/doc_sharing.html")),
+    shiny::column(4, statistics$global))
+}
+
+
+ended_panel <- function(global) {
+  statistics <- panel_statistics(
+    data = list(),
+    global = global,
+    title_global = "Typo Challenge statistics so far")
+
+  shiny::fluidRow(
+    shiny::column(
+      8,
+      shiny::includeHTML("include/ended.html"),
       shiny::includeHTML("include/doc_sharing.html")),
     shiny::column(4, statistics$global))
 }
