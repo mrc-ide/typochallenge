@@ -170,3 +170,12 @@ combine_contributions <- function(d) {
 list_to_character <- function(x) {
   vapply(x, identity, "")
 }
+
+
+challenge_is_over <- function() {
+  ## This is the canonical way of detecting if we're running on a shiny server.  This seems mad
+  ## https://stackoverflow.com/questions/31423144/how-to-know-if-the-app-is-running-at-local-or-on-server-r-shiny
+  ## https://groups.google.com/forum/#!searchin/shiny-discuss/Sys.getenv/shiny-discuss/JfvjuKdLssI/Ac86v7toJv8J
+  is_server <- nzchar(Sys.getenv("SHINY_PORT"))
+  is_server && Sys.Date() > as.Date("2018-11-18")
+}
