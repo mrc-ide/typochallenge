@@ -10,3 +10,6 @@ dat <- lapply(d[2, ], redux::bin_to_object)
 names(dat) <- vapply(d[1, ], identity, "")
 
 saveRDS(dat, "contributions.rds")
+
+emails <- con$SMEMBERS("shiny_dide:typochallenge:emails")
+writeLines(sort(unlist(emails)), "emails.txt")
