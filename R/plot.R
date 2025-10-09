@@ -201,7 +201,7 @@ plot_handwritten_date <- function(date = as.Date("01/01/2017",
   }
 
   # convert date to string with "/" separator
-  date <- as.character(date, format="%d/%m/%Y")
+  date <- format(date, "%d/%m/%Y")
 
   # create a "dot" image to separate day, month and year
   width <- 3

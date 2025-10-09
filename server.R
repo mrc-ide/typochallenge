@@ -294,7 +294,7 @@ render_prev <- function(prev, data, global) {
     feedback <- shiny::div(
       class = sprintf("panel panel-%s", type),
       shiny::div(class = "panel-heading",
-                 shiny::icon(paste(icon, "fa-lg")),
+                 shiny::icon(icon),
                  title),
       shiny::div(class = "panel-body", body_feedback))
     
@@ -335,7 +335,7 @@ panel_statistics <- function(data, global, title_global = "All time statistics (
     args <- list(
       shiny::span(
         class = "trophy-1",
-        shiny::icon(paste("cog", "fa-lg"))), 
+        shiny::icon("cog")), 
       shiny::strong("All: "), 
       sprintf(
         "%s",
@@ -344,7 +344,7 @@ panel_statistics <- function(data, global, title_global = "All time statistics (
     args <- list(
       shiny::span(
         class = "trophy-2",
-        shiny::icon(paste("cog", "fa-lg"))), 
+        shiny::icon("cog")), 
       shiny::strong("Correct: "), 
       sprintf(
         "%s",
@@ -353,7 +353,7 @@ panel_statistics <- function(data, global, title_global = "All time statistics (
     args <- list(
       shiny::span(
         class = "trophy-3",
-        shiny::icon(paste("cog", "fa-lg"))), 
+        shiny::icon("cog")), 
       shiny::strong("Correct in <5s: "), 
       sprintf(
         "%s",
@@ -387,7 +387,7 @@ panel_statistics <- function(data, global, title_global = "All time statistics (
     args2 <- lapply(seq_len(trophy_entered), function(e)
       shiny::span(
         class = "trophy-1",
-        shiny::icon(paste("trophy", "fa-lg"))))
+        shiny::icon("trophy")))
     args[seq(2, length(args2) + 1)] <- args2
     s6_troph <- do.call(shiny::p, args)
     
@@ -397,7 +397,7 @@ panel_statistics <- function(data, global, title_global = "All time statistics (
     args2 <- lapply(seq_len(trophy_correct), function(e)
       shiny::span(
         class = "trophy-2",
-        shiny::icon(paste("trophy", "fa-lg"))))
+        shiny::icon("trophy")))
     args[seq(2, length(args2) + 1)] <- args2
     s7_troph <- do.call(shiny::p, args)
     
@@ -408,7 +408,7 @@ panel_statistics <- function(data, global, title_global = "All time statistics (
       args2 <- lapply(seq_len(trophy_correct_fast), function(e)
         shiny::span(
           class = "trophy-3",
-          shiny::icon(paste("trophy", "fa-lg"))))
+          shiny::icon("trophy")))
       args[seq(2, length(args2) + 1)] <- args2
       s8_troph <- do.call(shiny::p, args)
       trophies <- lapply(list(s6_troph, s7_troph, s8_troph), shiny::p)
@@ -425,7 +425,7 @@ panel_statistics <- function(data, global, title_global = "All time statistics (
       args[[1]] <- leg1
       args[[2]]  <- shiny::span(
         class = "trophy-legend",
-        shiny::icon(paste("trophy", "fa-lg"))) 
+        shiny::icon("trophy")) 
       args[[3]] <- leg2
       legend <- do.call(shiny::p, args)
       
@@ -449,7 +449,7 @@ panel_statistics <- function(data, global, title_global = "All time statistics (
     args <- list(
       shiny::span(
         class = "trophy-1",
-        shiny::icon(paste("cogs", "fa-lg"))), 
+        shiny::icon("cogs")), 
       shiny::strong("All: "), 
       sprintf(
         "%s (%s / %s)",
@@ -460,7 +460,7 @@ panel_statistics <- function(data, global, title_global = "All time statistics (
     args <- list(
       shiny::span(
         class = "trophy-2",
-        shiny::icon(paste("cogs", "fa-lg"))), 
+        shiny::icon("cogs")), 
       shiny::strong("Correct: "), 
       sprintf(
         "%s (%s / %s)",
@@ -471,7 +471,7 @@ panel_statistics <- function(data, global, title_global = "All time statistics (
     args <- list(
       shiny::span(
         class = "trophy-3",
-        shiny::icon(paste("cogs", "fa-lg"))), 
+        shiny::icon("cogs")), 
       shiny::strong("Correct in <5s: "), 
       sprintf(
         "%s (%s / %s)",
@@ -490,21 +490,21 @@ panel_statistics <- function(data, global, title_global = "All time statistics (
   list(user = shiny::div(
     class = "panel panel-info",
     shiny::div(class = "panel-heading",
-               shiny::icon(paste("cog", "fa-lg")),
+               shiny::icon("cog"),
                "Your statistics"),
     shiny::div(class = "panel-body", body_stats)),
     
     global = shiny::div(
       class = "panel panel-info",
       shiny::div(class = "panel-heading",
-                 shiny::icon(paste("cogs", "fa-lg")),
+                 shiny::icon("cogs"),
                  title_global),
       shiny::div(class = "panel-body", all_time_stats)),
     
     trophies = shiny::div(
       class = "panel panel-info",
       shiny::div(class = "panel-heading",
-                 shiny::icon(paste("trophy", "fa-lg")),
+                 shiny::icon("trophy"),
                  "Your achievements"),
       shiny::div(class = "panel-body", trophies)))
 }

@@ -10,7 +10,7 @@ Install with
 
 ```
 install.packages(c("shiny", "shinyjs", "remotes", "thor", "uuid"))
-remotes::install_github(c("mrc-ide/rmnist"), upgrade = FALSE)
+remotes::install_github(c("mrc-ide/rmnist@update"), upgrade = FALSE)
 ```
 
 Prepare `rmnist` with
